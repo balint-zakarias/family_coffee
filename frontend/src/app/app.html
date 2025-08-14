@@ -1,0 +1,31 @@
+<header class="topbar">
+  <h1>{{ title() }}</h1>
+  <nav>
+    <a routerLink="/">Kezdőlap</a>
+    <a href="/admin/" target="_blank" rel="noopener">Admin</a>
+    <a href="/graphql" target="_blank" rel="noopener">GraphQL</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="search">
+    <input type="text" placeholder="Keresés a termékekben…" #q (keyup.enter)="fetchProducts(q.value)" />
+    <button (click)="fetchProducts(q.value)">Keresés</button>
+  </section>
+
+  <section *ngIf="loading()">Betöltés…</section>
+  <section *ngIf="error()" class="error">Hiba: {{ error() }}</section>
+
+  <section class="grid" *ngIf="!loading() && !error()">
+    <article class="card" *ngFor="let p of products()">
+      <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" />
+      <div class="info">
+        <h3>{{ p.name }}</h3>
+        <p class="category" *ngIf="p.category">{{ p.category.name }}</p>
+        <p class="price">{{ p.price | number:'1.0-0' }} Ft</p>
+      </div>
+    </article>
+  </section>
+</main>
+
+<router-outlet></router-outlet>

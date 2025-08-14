@@ -1,0 +1,32 @@
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.env.*
+venv/
+.envrc
+*.log
+
+# Django collectstatic
+/static/
+media/
+
+# --- Node / Angular ---
+node_modules/
+dist/
+build/
+.npmrc
+.pnpm-store/
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Docker ---
+*.pid
+*.seed
+*.tar
