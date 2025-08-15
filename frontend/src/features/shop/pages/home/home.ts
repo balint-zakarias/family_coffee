@@ -12,6 +12,15 @@ type SiteContent = {
   heroImage: string | null;
 };
 
+type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: string;
+  imageUrl: string | null;
+};
+
 @Component({
   selector: 'page-home',
   standalone: true,
@@ -23,6 +32,8 @@ export class Home {
   loading = signal<boolean>(true);
   error   = signal<string | null>(null);
 
+  popularProducts = signal<Product[]>([]);
+
   imageUrl  = signal<string>('/assets/hero.png'); // fallback kép (vagy marad gradient)
   title     = signal<string>('Exceptional brews, for you everytime!');
   subtitle  = signal<string>('Válogatott kávéink személyes kiszállítással.');
@@ -32,6 +43,7 @@ export class Home {
 
   constructor(private gql: Graphql) {
     this.load();
+    this.loadPopularProducts();
   }
 
   private async load() {
@@ -83,27 +95,26 @@ export class Home {
     }
   }
 
-    popularProducts = [
-        {
-          id: 1,
-          name: 'NESCAFÉ Espresso 1kg',
-          description: 'Gondosan válogatott kávébabokból készült.',
-          price: '8.490 Ft',
-          image: 'assets/images/nescafe-original.jpg'
-        },
-        {
-          id: 2,
-          name: 'NESCAFÉ Espresso 1kg',
-          description: 'Gondosan válogatott kávébabokból készült.',
-          price: '8.490 Ft',
-          image: 'assets/images/instant-coffee-jar.jpg'
-        },
-        {
-          id: 3,
-          name: 'NESCAFÉ Espresso 1kg',
-          description: 'Gondosan válogatott kávébabokból készült.',
-          price: '8.490 Ft',
-          image: 'assets/images/espresso-jar.jpg'
+  private async loadPopularProducts() {
+    const QUERY = /* GraphQL */ `
+      query PopularProducts {
+        popularProducts {
+          id
+          name
+          description
+          price
+          imageUrl
         }
-      ];
+      }
+    `;
+  
+    try {
+      const data = await this.gql.query<{ popularProducts: Product[] }>(QUERY);
+      if (data.popularProducts) {
+        this.popularProducts.set(data.popularProducts);
+      }
+    } catch (e: any) {
+      console.error('Hiba a népszerű termékek betöltésekor:', e);
+    }
+  }
 }

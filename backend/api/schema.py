@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.db.models import Q
+from django.db.models import Q,  Sum
 from django.conf import settings
 
 from catalog.models import Category, Product, ProductImage
@@ -141,6 +141,11 @@ class Query(graphene.ObjectType):
         description="Termék lekérése slug alapján",
     )
 
+    popular_products = graphene.List(
+        ProductType,
+        limit=graphene.Int(required=False, default_value=3)
+    )
+
     def resolve_ping(self, info):
         return "pong"
 
@@ -171,6 +176,16 @@ class Query(graphene.ObjectType):
 
     def resolve_product(self, info, slug):
         return Product.objects.select_related("category").prefetch_related("images").filter(slug=slug).first()
+    
+
+    def resolve_popular_products(self, info, limit):
+        return (
+            Product.objects
+            .filter(order_items__order__status=Order.Status.DELIVERED)
+            .annotate(total_sold=Sum("order_items__quantity"))
+            .order_by("-total_sold")[:limit]
+        )
+
 
 
 schema = graphene.Schema(query=Query)
