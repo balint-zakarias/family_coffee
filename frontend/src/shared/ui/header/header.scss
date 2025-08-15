@@ -1,0 +1,137 @@
+.topbar {
+    background: linear-gradient(135deg, #296100 0%, #204108 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  
+    .wrap {
+        height: 100px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        width: 100%;
+        padding: 0 32px;
+      }
+  }
+  
+  /* Brand rész - bal oldal */
+  .brand {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+  
+    &__family {
+      height: 50px;
+      display: block;
+    }
+  
+    &__by {
+      font-weight: 500;
+      opacity: .9;
+    }
+  
+    &__nestle {
+      height: 20px;
+      display: block;
+      transform: translateY(1px);
+    }
+  }
+  
+  /* Navigáció - közép */
+  .nav {
+    justify-self: center;
+    display: flex;
+    gap: 28px;
+  
+    a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: .2px;
+      position: relative;
+      padding: 6px 0;
+    }
+  
+    a.active::after,
+    a:hover::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 2px;
+      background: #f2d07a;
+      border-radius: 2px;
+    }
+  }
+  
+  /* Kosár - jobb oldal */
+  .cart {
+    justify-self: end;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    text-decoration: none;
+  
+    &:hover {
+      background: rgba(255, 255, 255, .08);
+    }
+  
+    &__icon {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+  
+    &__badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background: #f2d07a;
+      color: #2a2a2a;
+      border-radius: 999px;
+      font-size: 12px;
+      line-height: 18px;
+      text-align: center;
+      font-weight: 700;
+    }
+  
+    &__badge.hidden {
+      display: none;
+    }
+  }
+  
+  /* Mobil */
+  @media (max-width: 820px) {
+    .wrap {
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  
+    .nav {
+      gap: 18px;
+  
+      a {
+        font-weight: 600;
+      }
+    }
+  
+    .brand__family {
+      height: 24px;
+    }
+  
+    .brand__nestle {
+      height: 18px;
+    }
+  }

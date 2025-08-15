@@ -1,0 +1,24 @@
+<header class="topbar">
+  <div class="wrap">
+    <!-- Bal oldal -->
+    <a class="brand" routerLink="/" aria-label="Family Coffee – Főoldal">
+      <img class="brand__family" [src]="brand().family" alt="Family Coffee">
+      <span class="brand__by">by</span>
+      <img class="brand__nestle" [src]="brand().nestle" alt="Nestlé">
+    </a>
+
+    <!-- Közép -->
+    <nav class="nav" aria-label="Fő navigáció">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Főoldal</a>
+      <a routerLink="/about" routerLinkActive="active">Rólunk</a>
+      <a routerLink="/contact" routerLinkActive="active">Kapcsolat</a>
+      <a routerLink="/shop" routerLinkActive="active">Webshop</a>
+    </nav>
+
+    <!-- Jobb oldal -->
+    <a class="cart" routerLink="/cart" aria-label="Kosár">
+      <img class="cart__icon" [src]="cartIcon()" alt="" aria-hidden="true">
+      <span class="cart__badge" *ngIf="cartCount() as c" [class.hidden]="!c">{{ c }}</span>
+    </a>
+  </div>
+</header>

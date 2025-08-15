@@ -1,0 +1,11 @@
+<article class="card">
+    <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" loading="lazy">
+    <div class="info">
+      <h3>{{ product.name }}</h3>
+      <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
+      <div class="actions">
+        <button type="button">Kosárba</button>
+        <button type="button">Részletek</button>
+      </div>
+    </div>
+  </article>

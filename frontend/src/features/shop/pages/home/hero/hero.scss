@@ -1,0 +1,72 @@
+/* Header magassága – nálad 80px */
+$header-height: 80px;
+
+/* Teljes szélességű hero, a viewport magasságából levonva a headert */
+.hero {
+  /* Rétegezett háttér: először a kép (ha 404 → none), alatta a gradient fallback */
+  background-image: var(--hero-bg), linear-gradient(135deg, #296100 0%, #204108 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+
+  color: #fff;
+  width: 100%;
+  height: calc(100vh - #{$header-height});
+  min-height: 420px; /* hogy kisebb kijelzőn is szép legyen */
+
+  display: block;
+}
+
+/* kétoszlopos belső layout – bal: szöveg, jobb: üres (kép látszik) */
+.hero__inner {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding-inline: 32px; /* bal/jobb légzés */
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero__left {
+  max-width: 600px;
+}
+
+.hero__title {
+  font-family: 'Playfair Display', serif;
+  margin: 0 0 16px;
+  font-size: clamp(28px, 4.2vw, 56px);
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.hero__subtitle {
+  margin: 0 0 24px;
+  font-size: clamp(16px, 1.6vw, 20px);
+  line-height: 1.5;
+  opacity: .95;
+}
+
+.hero__btn {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #e3b347;
+  color: #2a2a2a;
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,.15);
+  &:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.2); }
+  &:active { transform: translateY(0); box-shadow: 0 5px 12px rgba(0,0,0,.15); }
+}
+
+/* Mobilon egymás alatt legyen */
+@media (max-width: 900px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    padding-inline: 16px;
+  }
+  .hero__left { max-width: 100%; }
+}

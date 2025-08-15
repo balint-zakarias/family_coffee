@@ -1,0 +1,163 @@
+.home-page {
+    .hero {
+      padding: 4rem 0;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  
+      .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+  
+      .hero-text {
+        h1 {
+          font-size: 4rem;
+          font-weight: 300;
+          color: #ffffff;
+          line-height: 1.1;
+        }
+      }
+  
+      .hero-image {
+        img {
+          width: 100%;
+          height: 400px;
+          object-fit: cover;
+          border-radius: 12px;
+        }
+      }
+    }
+  
+    .popular-products {
+      padding: 4rem 0;
+  
+      h2 {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+  
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+  
+      .product-card {
+        background: #2a2a2a;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+  
+        &:hover {
+          transform: translateY(-4px);
+        }
+  
+        img {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+        }
+  
+        h3 {
+          color: #ffffff;
+          margin-bottom: 0.5rem;
+        }
+  
+        p {
+          color: #cccccc;
+          font-size: 0.9rem;
+          margin-bottom: 1rem;
+        }
+  
+        .product-price {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #d4af37;
+        }
+      }
+    }
+  
+    .about {
+      padding: 4rem 0;
+      background: #222;
+  
+      .about-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+  
+      .about-text {
+        h2 {
+          margin-bottom: 1.5rem;
+        }
+  
+        p {
+          font-size: 1.1rem;
+          line-height: 1.8;
+        }
+      }
+  
+      .about-image {
+        img {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+          border-radius: 12px;
+        }
+      }
+    }
+  
+    .contact {
+      padding: 4rem 0;
+  
+      h2 {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+  
+      .contact-form {
+        max-width: 600px;
+        margin: 0 auto;
+  
+        .form-row {
+          margin-bottom: 1.5rem;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .home-page {
+      .hero {
+        .hero-content {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+  
+        .hero-text h1 {
+          font-size: 2.5rem;
+        }
+      }
+  
+      .about {
+        .about-content {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+      }
+  
+      .popular-products {
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+  
+  

@@ -1,0 +1,3 @@
+.toolbar { display:flex; gap:8px; margin-bottom:16px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.error { color:#a00; background:#fee; padding:8px; border:1px solid #fbb; }
