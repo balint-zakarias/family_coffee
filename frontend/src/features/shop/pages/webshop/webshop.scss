@@ -1,0 +1,19 @@
+/* Header magasság: igazítsd a ténylegeshez */
+$header-height: 80px;
+
+/* --- Hero --- */
+.shop-hero {
+  width: 100%;
+  height: calc(75vh - #{$header-height});
+  min-height: 420px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: block;
+}
+
+.list-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}

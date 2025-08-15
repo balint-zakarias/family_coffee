@@ -15,6 +15,8 @@ class SiteContent(models.Model):
     about_subtitle = models.CharField(max_length=240, blank=True, default="")
     about_body = models.TextField(blank=True, default="")
 
+    webshop_image = models.ImageField(upload_to="site/", blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

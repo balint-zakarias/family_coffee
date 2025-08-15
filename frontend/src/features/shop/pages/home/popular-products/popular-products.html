@@ -1,0 +1,19 @@
+<section class="popular-products" *ngIf="products.length">
+    <h2>Népszerű termékeink</h2>
+    <div class="products-grid">
+      <div
+        class="product-card"
+        *ngFor="let product of products"
+        [routerLink]="['/product', product.slug]"
+      >
+        <div class="image-wrapper">
+          <img [src]="product.imageUrl || '/assets/no-image.png'" [alt]="product.name" />
+        </div>
+        <div class="meta">
+          <h3>{{ product.name }}</h3>
+          <p class="desc">{{ product.description }}</p>
+          <div class="product-price">{{ product.price }} Ft</div>
+        </div>
+      </div>
+    </div>
+  </section>

@@ -6,46 +6,28 @@
 
   <!-- Hero -->
   <section-hero
-  *ngIf="!error()"
-  [imageUrl]="imageUrl() || ''"
-  [title]="title() || ''"
-  [subtitle]="subtitle() || ''"
-  [ctaText]="ctaText() || ''"
-  [ctaLink]="ctaLink() || ''"
-></section-hero>
+    *ngIf="!error()"
+    [imageUrl]="heroImageUrl() || ''"
+    [title]="title() || ''"
+    [subtitle]="subtitle() || ''"
+    [ctaText]="ctaText() || ''"
+    [ctaLink]="ctaLink() || ''"
+  ></section-hero>
 
   <!-- Popular Products -->
-  <section class="popular-products">
-    <h2>Népszerű termékeink</h2>
-    <div class="products-grid">
-      <div
-        class="product-card"
-        *ngFor="let product of popularProducts()"
-        [routerLink]="['/product', product.slug]"
-      >
-        <div class="image-wrapper">
-          <img [src]="product.imageUrl || '/assets/no-image.png'" [alt]="product.name" />
-        </div>
-        <div class="meta">
-          <h3>{{ product.name }}</h3>
-          <p class="desc">{{ product.description }}</p>
-          <div class="product-price">{{ product.price }} Ft</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <app-popular-products [products]="popularProducts()"></app-popular-products>
 
   <!-- About + Contact -->
   <section class="about-contact">
     <!-- About -->
-    <!-- About -->
     <app-about
+      id="about"
       [aboutTitle]="aboutTitle()"
       [aboutBody]="aboutBody()"
-      [aboutImage]="aboutImage()"
+      [aboutImage]="aboutImageUrl()"
     ></app-about>
 
     <!-- Contact -->
-    <app-contact-form></app-contact-form>
+    <app-contact-form id="contact"></app-contact-form>
   </section>
 </div>

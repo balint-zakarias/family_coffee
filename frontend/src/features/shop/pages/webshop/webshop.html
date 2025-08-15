@@ -1,0 +1,12 @@
+<!-- Hero – teljes szélesség / magasság (headerrel csökkentve) -->
+<section
+  class="shop-hero"
+  [class.shop-hero--fallback]="!heroImage()"
+  [style.backgroundImage]="heroImage() ? 'url(' + heroImage() + ')' : ''"
+  aria-label="Webshop hero"
+></section>
+
+<!-- Terméklista – a meglévő List komponenst beágyazzuk -->
+<section class="list-wrap">
+  <page-list></page-list>
+</section>

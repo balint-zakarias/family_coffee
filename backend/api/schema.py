@@ -55,6 +55,10 @@ class ProductType(DjangoObjectType):
 
 
 class SiteContentType(DjangoObjectType):
+    hero_image_url = graphene.String()
+    about_image_url = graphene.String()
+    webshop_image_url = graphene.String()
+
     class Meta:
         model = SiteContent
         fields = (
@@ -72,8 +76,22 @@ class SiteContentType(DjangoObjectType):
             "updated_at",
         )
 
+    def resolve_hero_image_url(self, info):
+        if self.hero_image:
+            return info.context.build_absolute_uri(self.hero_image.url)
+        return None
 
-# (Az Orders/Contact típust most nem fogjuk publikussá tenni, de itt a mintájuk.)
+    def resolve_about_image_url(self, info):
+        if self.about_image:
+            return info.context.build_absolute_uri(self.about_image.url)
+        return None
+    
+    def resolve_webshop_image_url(self, info):
+        if self.webshop_image:
+            return info.context.build_absolute_uri(self.webshop_image.url)
+        return None
+
+
 class OrderItemType(DjangoObjectType):
     class Meta:
         model = OrderItem
@@ -143,6 +161,7 @@ class Query(graphene.ObjectType):
         ProductType,
         search=graphene.String(required=False),
         category_slug=graphene.String(required=False),
+        category_id=graphene.Int(required=False),
         is_active=graphene.Boolean(required=False),
         limit=graphene.Int(required=False),
         offset=graphene.Int(required=False),
@@ -172,12 +191,14 @@ class Query(graphene.ObjectType):
     def resolve_category(self, info, slug):
         return Category.objects.filter(slug=slug).first()
 
-    def resolve_products(self, info, search=None, category_slug=None, is_active=True, limit=20, offset=0):
+    def resolve_products(self, info, search=None, category_slug=None, category_id=None, is_active=True, limit=20, offset=0):
         qs = Product.objects.all().select_related("category").prefetch_related("images")
         if is_active is not None:
             qs = qs.filter(is_active=is_active)
         if category_slug:
             qs = qs.filter(category__slug=category_slug)
+        if category_id:
+            qs = qs.filter(category_id=category_id)    
         if search:
             s = search.strip()
             qs = qs.filter(

@@ -1,3 +1,100 @@
-.toolbar { display:flex; gap:8px; margin-bottom:16px; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
-.error { color:#a00; background:#fee; padding:8px; border:1px solid #fbb; }
+/* Sáv a hero alatt */
+.search {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  
+    input {
+      flex: 1;
+      height: 44px;
+      padding: 0 14px;
+      border: 2px solid #6b4f36;
+      border-radius: 10px;
+      background: transparent;
+      font: 400 16px/1.2 'Lexend', system-ui, sans-serif;
+      color: #6b4f36;
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+  
+      &::placeholder { color: #a68a74; }
+  
+      &:focus {
+        border-color: #8a6446;
+        box-shadow: 0 0 0 3px rgba(107, 79, 54, .25);
+      }
+    }
+  
+    button {
+      height: 44px;
+      padding: 0 18px;
+      border: 2px solid #6b4f36;
+      border-radius: 10px;
+      background: #6b4f36;
+      color: #f1e7dc;
+      font: 600 14px/1 'Lexend', system-ui, sans-serif;
+      cursor: pointer;
+      transition: transform .08s ease, background .15s ease, color .15s ease;
+  
+      &:hover {
+        background: #8a6446;
+        border-color: #8a6446;
+      }
+  
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  
+    .chip {
+      appearance: none;
+      border: 2px solid #6b4f36;
+      background: transparent;
+      color: #6b4f36;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font: 600 14px/1 'Lexend', system-ui, sans-serif;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, transform .08s ease, color .15s ease;
+  
+      &:hover { 
+        border-color: #8a6446;
+        color: #8a6446;
+      }
+  
+      &:active { 
+        transform: translateY(1px); 
+      }
+  
+      &.active {
+        background: #6b4f36;
+        color: #f1e7dc;
+      }
+    }
+  }
+  
+  .loading { text-align: center; padding: 24px 0; }
+  
+  .grid {
+    max-width: 1200px;
+    margin: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  
+  .error {
+    max-width: 1200px;
+    margin: 8px auto;
+    color: #8a1c1c;
+    background: #fee;
+    padding: 10px 12px;
+    border: 1px solid #fbb;
+    border-radius: 8px;
+  }

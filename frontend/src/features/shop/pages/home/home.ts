@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { Hero } from './hero/hero';
+import { PopularProducts } from './popular-products/popular-products';
 import { Contact } from './contact/contact';
 import { About } from './about/about';
 import { RouterLink } from '@angular/router';
@@ -11,10 +12,10 @@ type SiteContent = {
   heroSubtitle: string | null;
   heroButtonText: string | null;
   heroButtonUrl: string | null;
-  heroImage: string | null;
+  heroImageUrl: string | null;
   aboutTitle: string | null;
   aboutSubtitle: string | null;
-  aboutImage: string | null;
+  aboutImageUrl: string | null;
   aboutBody: string | null;
 };
 
@@ -32,7 +33,7 @@ type Product = {
   standalone: true,
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
-  imports: [NgIf, NgFor, Hero, About, Contact, RouterLink]
+  imports: [NgIf, NgFor, Hero, PopularProducts, About, Contact, RouterLink]
 })
 export class Home {
   loading = signal<boolean>(true);
@@ -40,14 +41,14 @@ export class Home {
 
   popularProducts = signal<Product[]>([]);
 
-  imageUrl = signal<string | null>(null);
+  heroImageUrl = signal<string | null>(null);
   title = signal<string | null>(null);
   subtitle = signal<string | null>(null);
   ctaText = signal<string | null>(null);
   ctaLink = signal<string | null>(null);
   aboutTitle = signal<string | null>(null);
   aboutSubtitle = signal<string | null>(null);
-  aboutImage = signal<string | null>(null);
+  aboutImageUrl = signal<string | null>(null);
   aboutBody = signal<string | null>(null);
 
   constructor(private gql: Graphql) {
@@ -74,10 +75,10 @@ export class Home {
           heroSubtitle
           heroButtonText
           heroButtonUrl
-          heroImage
+          heroImageUrl
           aboutTitle
           aboutSubtitle
-          aboutImage
+          aboutImageUrl
           aboutBody
         }
       }
@@ -97,8 +98,8 @@ export class Home {
         if (sc.aboutSubtitle) this.aboutSubtitle.set(sc.aboutSubtitle);
         if (sc.aboutBody) this.aboutBody.set(sc.aboutBody);
 
-        if (sc.heroImage) this.imageUrl.set(this.normalizeUrl(sc.heroImage));
-        if (sc.aboutImage) this.aboutImage.set(this.normalizeUrl(sc.aboutImage));
+        if (sc.heroImageUrl) this.heroImageUrl.set(this.normalizeUrl(sc.heroImageUrl));
+        if (sc.aboutImageUrl) this.aboutImageUrl.set(this.normalizeUrl(sc.aboutImageUrl));
       }
     } catch (e: any) {
       this.error.set(String(e?.message || e));
