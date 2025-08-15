@@ -1,0 +1,41 @@
+<div class="contact">
+    <h2>Kapcsolat</h2>
+  
+    <form class="contact-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <input type="text" placeholder="Név" class="form-input" formControlName="name" />
+      </div>
+  
+      <div class="form-row inline-fields">
+        <input type="email" placeholder="E-mail" class="form-input" formControlName="email" />
+        <span class="or-text">vagy</span>
+        <input type="tel" placeholder="Telefonszám" class="form-input" formControlName="phone" />
+      </div>
+  
+      <div class="form-row">
+        <textarea placeholder="Üzenet" class="form-textarea" formControlName="message"></textarea>
+      </div>
+  
+      <div class="form-row">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="accepted" />
+          Elfogadom az <a href="">Adatvédelmi Nyilatkozatot.</a>
+        </label>
+      </div>
+  
+      <div *ngIf="error" class="msg error">{{ error }}</div>
+      <div class="submit-wrapper" [class.show-success]="success">
+        <button
+          type="submit"
+          class="submit-btn"
+          [disabled]="form.invalid || loading"
+        >
+          {{ loading ? 'Küldés…' : 'Küldés' }}
+        </button>
+      
+        <div class="success-message">
+          <span class="checkmark">✔</span> Elküldve!
+        </div>
+      </div>
+    </form>
+  </div>

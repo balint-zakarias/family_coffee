@@ -110,6 +110,20 @@ class OrderType(DjangoObjectType):
             "items",
         )
 
+class ContactMessageType(DjangoObjectType):
+    class Meta:
+        model = ContactMessage
+        fields = (
+            "id",
+            "name",
+            "email",
+            "phone",
+            "message",
+            "handled",
+            "created_at",
+            "updated_at",
+        )        
+
 
 # ============ Queries ============
 
@@ -186,6 +200,29 @@ class Query(graphene.ObjectType):
             .order_by("-total_sold")[:limit]
         )
 
+class CreateContactMessage(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+        email = graphene.String(required=False)
+        phone = graphene.String(required=False)
+        message = graphene.String(required=True)
+
+    contact_message = graphene.Field(ContactMessageType)
+
+    def mutate(self, info, name, message, email=None, phone=None):
+        if not email and not phone:
+            raise Exception("Legalább e-mailt vagy telefonszámot meg kell adni.")
+
+        contact_message = ContactMessage.objects.create(
+            name=name,
+            email=email,
+            phone=phone,
+            message=message
+        )
+        return CreateContactMessage(contact_message=contact_message)
 
 
-schema = graphene.Schema(query=Query)
+class Mutation(graphene.ObjectType):
+    create_contact_message = CreateContactMessage.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
