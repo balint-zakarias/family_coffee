@@ -1,81 +1,77 @@
 <div class="home-page">
-    <!-- Hero Section -->
-    <section *ngIf="error()" class="container" style="padding: 16px;">
-      <p>Hiba történt a kezdőlap betöltése közben: {{ error() }}</p>
-    </section>
-    
-    <!-- hero -->
-    <section-hero
-      *ngIf="!error()"
-      [imageUrl]="imageUrl()"
-      [title]="title()"
-      [subtitle]="subtitle()"
-      [ctaText]="ctaText()"
-      [ctaLink]="ctaLink()"
-    ></section-hero>
+  <!-- Hiba -->
+  <section *ngIf="error()" class="container" style="padding: 16px;">
+    <p>Hiba történt a kezdőlap betöltése közben: {{ error() }}</p>
+  </section>
 
-<!-- ide jöhet később a „Népszerű termékek” blokk stb. -->
-  
-    <!-- Popular Products Section -->
-    <section class="popular-products">
-      <h2>Népszerű termékeink</h2>
-    
-      <div class="products-grid">
-        <div class="product-card" *ngFor="let product of popularProducts()" [routerLink]="['/product', product.slug]">
-          <div class="image-wrapper">
-            <img [src]="product.imageUrl || '/assets/no-image.png'" [alt]="product.name" />
-          </div>
-    
-          <div class="meta">
-            <h3>{{ product.name }}</h3>
-            <p class="desc">{{ product.description }}</p>
-            <div class="product-price">{{ product.price }} Ft</div>
-          </div>
+  <!-- Hero -->
+  <section-hero
+  *ngIf="!error()"
+  [imageUrl]="imageUrl() || ''"
+  [title]="title() || ''"
+  [subtitle]="subtitle() || ''"
+  [ctaText]="ctaText() || ''"
+  [ctaLink]="ctaLink() || ''"
+></section-hero>
+
+  <!-- Popular Products -->
+  <section class="popular-products">
+    <h2>Népszerű termékeink</h2>
+    <div class="products-grid">
+      <div
+        class="product-card"
+        *ngFor="let product of popularProducts()"
+        [routerLink]="['/product', product.slug]"
+      >
+        <div class="image-wrapper">
+          <img [src]="product.imageUrl || '/assets/no-image.png'" [alt]="product.name" />
+        </div>
+        <div class="meta">
+          <h3>{{ product.name }}</h3>
+          <p class="desc">{{ product.description }}</p>
+          <div class="product-price">{{ product.price }} Ft</div>
         </div>
       </div>
-    </section>
-  
-    <!-- About Section -->
-    <section class="about">
-      <div class="container">
-        <div class="about-content">
-          <div class="about-text">
-            <h2>Rólunk</h2>
-            <p>
-              Egyedülálló vállalkozásként hiszek abban, hogy a személyes kapcsolat, a megbízhatóság és a szakértelem alapozza meg azt a bizalmat, amit partnereink és vásárlóink évek óta tapasztalnak. Legyen szó anthoni kávéajanlatokról, irodai ügyfelekről vagy vendéglátóhelyekről – mindenkit ugyanazzal az odaadással szolgálok ki.
-            </p>
-          </div>
-          <div class="about-image">
-            <img src="assets/images/coffee-beans-cup.jpg" alt="Coffee beans" />
-          </div>
+    </div>
+  </section>
+
+  <!-- About + Contact -->
+  <section class="about-contact">
+    <!-- About -->
+    <div
+      class="about"
+      [style.backgroundImage]="aboutImage() ? 'url(' + aboutImage() + ')' : ''"
+      [style.backgroundColor]="aboutImage() ? '' : '#f1d5a0'"
+    >
+      <div class="about-content">
+        <div class="about-text">
+          <h2>{{ aboutTitle() }}</h2>
+          <p>{{ aboutBody() }}</p>
         </div>
       </div>
-    </section>
-  
-    <!-- Contact Section -->
-    <section class="contact">
-      <div class="container">
-        <h2>Kapcsolat</h2>
-        <form class="contact-form">
-          <div class="form-row">
-            <input type="text" placeholder="Név" class="form-input" />
-          </div>
-          <div class="form-row">
-            <input type="email" placeholder="E-mail" class="form-input" />
-          </div>
-          <div class="form-row">
-            <textarea placeholder="Üzenet" class="form-textarea"></textarea>
-          </div>
-          <div class="form-row">
-            <label class="checkbox-label">
-              <input type="checkbox" />
-              Elfogadom az Adatvédelmi Nyilatkozatot
-            </label>
-          </div>
-          <button type="submit" class="submit-btn">Küldés</button>
-        </form>
-      </div>
-    </section>
-  </div>
-  
-  
+    </div>
+
+    <!-- Contact -->
+    <div class="contact">
+      <h2>Kapcsolat</h2>
+      <form class="contact-form">
+        <div class="form-row">
+          <input type="text" placeholder="Név" class="form-input" />
+        </div>
+        <div class="form-row">
+          <input type="email" placeholder="E-mail" class="form-input" />
+        </div>
+        <div class="form-row">
+          <textarea placeholder="Üzenet" class="form-textarea"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" />
+            Elfogadom az<a href=''>Adatvédelmi Nyilatkozatot.</a>
+          </label>
+        </div>
+        <button type="submit" class="submit-btn">Küldés</button>
+      </form>
+    </div>
+  </section>
+</div>

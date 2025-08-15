@@ -10,6 +10,10 @@ type SiteContent = {
   heroButtonText: string | null;
   heroButtonUrl: string | null;
   heroImage: string | null;
+  aboutTitle: string | null;
+  aboutSubtitle: string | null;
+  aboutImage: string | null;
+  aboutBody: string | null;
 };
 
 type Product = {
@@ -30,20 +34,31 @@ type Product = {
 })
 export class Home {
   loading = signal<boolean>(true);
-  error   = signal<string | null>(null);
+  error = signal<string | null>(null);
 
   popularProducts = signal<Product[]>([]);
 
-  imageUrl  = signal<string>('/assets/hero.png'); // fallback kép (vagy marad gradient)
-  title     = signal<string>('Exceptional brews, for you everytime!');
-  subtitle  = signal<string>('Válogatott kávéink személyes kiszállítással.');
-  ctaText   = signal<string>('Webshop');
-  ctaLink   = signal<string>('/shop');
-
+  imageUrl = signal<string | null>(null);
+  title = signal<string | null>(null);
+  subtitle = signal<string | null>(null);
+  ctaText = signal<string | null>(null);
+  ctaLink = signal<string | null>(null);
+  aboutTitle = signal<string | null>(null);
+  aboutSubtitle = signal<string | null>(null);
+  aboutImage = signal<string | null>(null);
+  aboutBody = signal<string | null>(null);
 
   constructor(private gql: Graphql) {
     this.load();
     this.loadPopularProducts();
+  }
+
+  private normalizeUrl(url: string | null): string | null {
+    if (!url) return null;
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http')) return trimmed;
+    if (trimmed.startsWith('/')) return trimmed;
+    return `/${trimmed}`;
   }
 
   private async load() {
@@ -58,6 +73,10 @@ export class Home {
           heroButtonText
           heroButtonUrl
           heroImage
+          aboutTitle
+          aboutSubtitle
+          aboutImage
+          aboutBody
         }
       }
     `;
@@ -68,25 +87,16 @@ export class Home {
       if (data.siteContent) {
         const sc = data.siteContent;
 
-        if (sc.heroTitle)    this.title.set(sc.heroTitle);
+        if (sc.heroTitle) this.title.set(sc.heroTitle);
         if (sc.heroSubtitle) this.subtitle.set(sc.heroSubtitle);
         if (sc.heroButtonText) this.ctaText.set(sc.heroButtonText);
         if (sc.heroButtonUrl) this.ctaLink.set(sc.heroButtonUrl);
+        if (sc.aboutTitle) this.aboutTitle.set(sc.aboutTitle);
+        if (sc.aboutSubtitle) this.aboutSubtitle.set(sc.aboutSubtitle);
+        if (sc.aboutBody) this.aboutBody.set(sc.aboutBody);
 
-        // kép URL normalizálása:
-        // - ha a backend teljes URL-t ad (http...), használjuk
-        // - ha relatív pl. "/media/...", az Angular dev proxy kiszolgálja → használható
-        if (sc.heroImage) {
-          const url = sc.heroImage.trim();
-          if (url.startsWith('http')) {
-            this.imageUrl.set(url);
-          } else if (url.startsWith('/')) {
-            this.imageUrl.set(url); // pl. "/media/site/hero.jpg"
-          } else {
-            // biztonság kedvéért relatív eset: tegyünk elé perjelet
-            this.imageUrl.set('/' + url);
-          }
-        }
+        if (sc.heroImage) this.imageUrl.set(this.normalizeUrl(sc.heroImage));
+        if (sc.aboutImage) this.aboutImage.set(this.normalizeUrl(sc.aboutImage));
       }
     } catch (e: any) {
       this.error.set(String(e?.message || e));
@@ -101,6 +111,7 @@ export class Home {
         popularProducts {
           id
           name
+          slug
           description
           price
           imageUrl
