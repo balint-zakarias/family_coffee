@@ -38,18 +38,12 @@
   <!-- About + Contact -->
   <section class="about-contact">
     <!-- About -->
-    <div
-      class="about"
-      [style.backgroundImage]="aboutImage() ? 'url(' + aboutImage() + ')' : ''"
-      [style.backgroundColor]="aboutImage() ? '' : '#f1d5a0'"
-    >
-      <div class="about-content">
-        <div class="about-text">
-          <h2>{{ aboutTitle() }}</h2>
-          <p>{{ aboutBody() }}</p>
-        </div>
-      </div>
-    </div>
+    <!-- About -->
+    <app-about
+      [aboutTitle]="aboutTitle()"
+      [aboutBody]="aboutBody()"
+      [aboutImage]="aboutImage()"
+    ></app-about>
 
     <!-- Contact -->
     <app-contact-form></app-contact-form>

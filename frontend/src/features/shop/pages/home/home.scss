@@ -118,40 +118,12 @@
     .about-contact {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      align-items: stretch;
       gap: 0;
       width: 100%;
       margin: 0;
       padding: 0;
       
-
-    
-      .about {
-        padding: 2rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background-color: #f1d5a0;
-      
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-      
-      
-        h2 {
-          margin-bottom: 3rem;
-          font-family: 'Playfair Display', serif;
-          font-weight: 400;
-          font-size: 3rem;
-          color: #2e2219;
-        }
-      
-        .about-content {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          padding: 2rem;
-        }
-      }
       @media (max-width: 900px) {
         grid-template-columns: 1fr;
       }

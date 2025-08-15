@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { Hero } from './hero/hero';
 import { Contact } from './contact/contact';
+import { About } from './about/about';
 import { RouterLink } from '@angular/router';
 import { Graphql } from '../../../../core/graphql.service';
 import { NgIf, NgFor } from '@angular/common';
@@ -31,7 +32,7 @@ type Product = {
   standalone: true,
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
-  imports: [NgIf, NgFor, Hero, Contact, RouterLink]
+  imports: [NgIf, NgFor, Hero, About, Contact, RouterLink]
 })
 export class Home {
   loading = signal<boolean>(true);
