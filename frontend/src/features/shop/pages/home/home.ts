@@ -2,13 +2,14 @@ import { Component, signal } from '@angular/core';
 import { Hero } from './hero/hero';
 import { RouterLink } from '@angular/router';
 import { Graphql } from '../../../../core/graphql.service';
+import { NgIf, NgFor } from '@angular/common';
 
 type SiteContent = {
   heroTitle: string | null;
   heroSubtitle: string | null;
   heroButtonText: string | null;
-  heroButtonLink: string | null;
-  heroImageUrl: string | null;
+  heroButtonUrl: string | null;
+  heroImage: string | null;
 };
 
 @Component({
@@ -16,7 +17,7 @@ type SiteContent = {
   standalone: true,
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
-  imports: [Hero, RouterLink]
+  imports: [NgIf, NgFor, Hero, RouterLink]
 })
 export class Home {
   loading = signal<boolean>(true);
@@ -43,8 +44,8 @@ export class Home {
           heroTitle
           heroSubtitle
           heroButtonText
-          heroButtonLink
-          heroImageUrl
+          heroButtonUrl
+          heroImage
         }
       }
     `;
@@ -58,13 +59,13 @@ export class Home {
         if (sc.heroTitle)    this.title.set(sc.heroTitle);
         if (sc.heroSubtitle) this.subtitle.set(sc.heroSubtitle);
         if (sc.heroButtonText) this.ctaText.set(sc.heroButtonText);
-        if (sc.heroButtonLink) this.ctaLink.set(sc.heroButtonLink);
+        if (sc.heroButtonUrl) this.ctaLink.set(sc.heroButtonUrl);
 
         // kép URL normalizálása:
         // - ha a backend teljes URL-t ad (http...), használjuk
         // - ha relatív pl. "/media/...", az Angular dev proxy kiszolgálja → használható
-        if (sc.heroImageUrl) {
-          const url = sc.heroImageUrl.trim();
+        if (sc.heroImage) {
+          const url = sc.heroImage.trim();
           if (url.startsWith('http')) {
             this.imageUrl.set(url);
           } else if (url.startsWith('/')) {
