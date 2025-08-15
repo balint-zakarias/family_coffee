@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from '@shared/ui/header/header';
 import { Footer } from '@shared/ui/footer/footer';
+import { CookieBanner } from '@shared/ui/cookie-banner/cookie-banner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Header, Footer],
+  imports: [RouterOutlet, Header, Footer, CookieBanner],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
