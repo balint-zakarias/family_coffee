@@ -48,6 +48,7 @@ export class List implements OnInit {
       query($search: String, $limit: Int, $categorySlug: String) {
         products(search: $search, categorySlug: $categorySlug, limit: $limit) {
           name
+          description
           price
           imageUrl
         }

@@ -1,11 +1,16 @@
 <article class="card">
+  <div class="image-wrap">
     <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" loading="lazy">
-    <div class="info">
-      <h3>{{ product.name }}</h3>
-      <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
-      <div class="actions">
-        <button class="cart" type="button">Kosárba</button>
-        <button class="details" type="button">Részletek</button>
-      </div>
+  </div>
+
+  <div class="info">
+    <h3 class="title">{{ product.name }}</h3>
+    <p class="muted" *ngIf="product.description as d">{{ d }}</p>
+    <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
+
+    <div class="actions">
+      <button class="cart" type="button">Kosárba</button>
+      <button class="details" type="button">Részletek</button>
     </div>
-  </article>
+  </div>
+</article>
