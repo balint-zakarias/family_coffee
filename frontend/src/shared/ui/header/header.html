@@ -15,7 +15,14 @@
 
     <a class="cart" routerLink="/cart" aria-label="Kosár">
       <img class="cart__icon" [src]="cartIcon()" alt="" aria-hidden="true">
-      <span class="cart__badge" *ngIf="cartCount() as c" [class.hidden]="!c">{{ c }}</span>
+    
+      <ng-container *ngIf="cartCount() as c">
+        <span class="cart__badge" *ngIf="c > 0">
+          {{ c > 99 ? '99+' : c }}
+        </span>
+        <!-- Polite refresh -->
+        <span class="sr-only" aria-live="polite">{{ c }} tétel a kosárban</span>
+      </ng-container>
     </a>
   </div>
 </header>

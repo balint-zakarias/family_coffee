@@ -33,5 +33,9 @@
 <section *ngIf="error()" class="error">Hiba: {{ error() }}</section>
 
 <section class="grid" *ngIf="!loading() && !error()">
-  <ui-product-card *ngFor="let p of products()" [product]="p"></ui-product-card>
+  <ui-product-card *ngFor="let p of products()" 
+  [product]="p"
+  (addToCart)="onAddToCart($event)"
+  (viewDetails)="onViewDetails($event)"
+  ></ui-product-card>
 </section>

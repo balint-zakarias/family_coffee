@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { Header } from '@shared/ui/header/header';
 import { Footer } from '@shared/ui/footer/footer';
 import { CookieBanner } from '@shared/ui/cookie-banner/cookie-banner';
+import { CartService } from 'core/cart.service';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,6 @@ import { CookieBanner } from '@shared/ui/cookie-banner/cookie-banner';
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
-export class App {}
+export class App {
+  constructor(private cart: CartService) { this.cart.loadCountOnce(); }
+}

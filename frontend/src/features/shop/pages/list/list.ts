@@ -3,6 +3,8 @@ import { NgIf, NgFor, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Graphql } from '../../../../core/graphql.service';
 import { ProductCard, UiProduct } from '../../../../shared/ui/product-card/product-card';
+import { CartService } from 'core/cart.service';
+
 
 type Category = { id: string; name: string; slug: string };
 
@@ -25,7 +27,8 @@ export class List implements OnInit {
   constructor(
     private gql: Graphql,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cartService: CartService
   ) {}
 
   ngOnInit() {
@@ -47,6 +50,7 @@ export class List implements OnInit {
     const query = `
       query($search: String, $limit: Int, $categorySlug: String) {
         products(search: $search, categorySlug: $categorySlug, limit: $limit) {
+          id
           name
           description
           price
@@ -93,5 +97,16 @@ export class List implements OnInit {
       queryParams: { q: this.search() || null, category: this.selectedCategory() || null },
       queryParamsHandling: 'merge'
     });
+  }
+
+  onAddToCart(p: UiProduct) {
+    if (!p?.id) return;
+    this.cartService.add(String(p.id), 1).catch(err => console.error(err));
+  }
+  
+  onViewDetails(p: UiProduct) {
+    // pl. router navigate a termékoldalra
+    // this.router.navigate(['/product', p.slug ?? p.id]);
+    console.log('Részletek:', p);
   }
 }

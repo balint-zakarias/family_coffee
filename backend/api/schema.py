@@ -7,7 +7,8 @@ from catalog.models import Category, Product, ProductImage
 from orders.models import Order, OrderItem
 from contentapp.models import SiteContent
 from contact.models import ContactMessage
-
+from cart.models import Cart, CartItem
+from cart.utils import get_or_create_cart
 
 # ============ GraphQL Types ============
 
@@ -143,6 +144,25 @@ class ContactMessageType(DjangoObjectType):
         )        
 
 
+class CartItemType(DjangoObjectType):
+    class Meta:
+        model = CartItem
+        fields = ("id", "quantity", "unit_price_snapshot", "line_total", "product")
+
+class CartType(DjangoObjectType):
+    subtotal = graphene.Decimal()
+
+    class Meta:
+        model = Cart
+        fields = ("id", "items", "created_at", "updated_at")
+
+    def resolve_subtotal(self, info):
+        return self.subtotal()
+
+class CartSummaryType(graphene.ObjectType):
+    count = graphene.Int(required=True)
+    subtotal = graphene.Decimal(required=True)
+
 # ============ Queries ============
 
 class Query(graphene.ObjectType):
@@ -178,6 +198,19 @@ class Query(graphene.ObjectType):
         ProductType,
         limit=graphene.Int(required=False, default_value=3)
     )
+
+
+    cart = graphene.Field(CartType)
+    cart_summary = graphene.Field(CartSummaryType)
+
+    def resolve_cart(self, info):
+        return get_or_create_cart(info.context)
+
+    def resolve_cart_summary(self, info):
+        cart = get_or_create_cart(info.context)
+        count = cart.items.aggregate(n=Sum("quantity"))["n"] or 0
+
+        return CartSummaryType(count=count, subtotal=cart.subtotal())
 
     def resolve_ping(self, info):
         return "pong"
@@ -241,9 +274,69 @@ class CreateContactMessage(graphene.Mutation):
             message=message
         )
         return CreateContactMessage(contact_message=contact_message)
+class AddToCart(graphene.Mutation):
+    class Arguments:
+        product_id = graphene.ID(required=True)
+        quantity   = graphene.Int(required=True)
 
+    cart = graphene.Field(CartType)
+
+    def mutate(self, info, product_id, quantity):
+        cart = get_or_create_cart(info.context)
+        product = Product.objects.filter(id=product_id, is_active=True).first()
+        if not product:
+            raise Exception("A termék nem elérhető.")
+
+        item, created = CartItem.objects.select_for_update().get_or_create(
+            cart=cart, product=product,
+            defaults={"quantity": max(1, quantity), "unit_price_snapshot": product.price}
+        )
+        if not created:
+            item.quantity = max(1, item.quantity + quantity)
+            item.unit_price_snapshot = product.price
+        item.save()
+        return AddToCart(cart=cart)
+
+
+class SetQuantity(graphene.Mutation):
+    class Arguments:
+        item_id  = graphene.ID(required=True)
+        quantity = graphene.Int(required=True)
+
+    cart = graphene.Field(CartType)
+
+    def mutate(self, info, item_id, quantity):
+        cart = get_or_create_cart(info.context)
+        item = CartItem.objects.select_for_update().filter(id=item_id, cart=cart).first()
+        if not item:
+            raise Exception("Tétel nem található.")
+
+        if quantity <= 0:
+            item.delete()
+        else:
+            item.quantity = quantity
+            item.unit_price_snapshot = item.product.price
+            item.save()
+        return SetQuantity(cart=cart)
+
+
+class RemoveItem(graphene.Mutation):
+    class Arguments:
+        item_id = graphene.ID(required=True)
+
+    cart = graphene.Field(CartType)
+
+    def mutate(self, info, item_id):
+        cart = get_or_create_cart(info.context)
+        CartItem.objects.filter(id=item_id, cart=cart).delete()
+        return RemoveItem(cart=cart)
 
 class Mutation(graphene.ObjectType):
     create_contact_message = CreateContactMessage.Field()
+
+    add_to_cart  = AddToCart.Field()
+    set_quantity = SetQuantity.Field()
+    remove_item  = RemoveItem.Field()
+
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

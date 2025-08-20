@@ -1,1 +1,272 @@
-/* később dizájn */
+.cart-page {
+    background: var(--bg);
+    --price-w: 12ch;
+  
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+  
+    /* Fejléc + tételek */
+    .head {
+      padding-top: 36px;
+      padding-bottom: 24px;
+    }
+  
+    h1 {
+      margin: 0 0 18px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: clamp(36px, 5vw, 64px);
+      color: #2e2219;
+    }
+  
+    h2 {
+      margin: 0 0 18px;
+      font-family: 'Lexend', system-ui, sans-serif;
+      font-weight: 600;
+      font-size: 28px;
+      color: #2e2219;
+    }
+  
+    .lines {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .line {
+      display: grid;
+      grid-template-columns: 1fr auto var(--price-w) auto;
+      align-items: center;
+      gap: 16px;
+  
+      padding: 12px 16px;
+      background: #e3d7c9;          /* világos bézs-szürke hátterű kártya */
+      border-radius: 12px;
+    }
+
+    .line.busy { opacity: .6; transition: opacity .15s ease; }
+  .qbtn[disabled], .trash[disabled] { opacity: .5; pointer-events: none; }
+  .status { padding: 12px 16px; }
+  .status.error { color: #8a1c1c; background: #fee; border: 1px solid #fbb; border-radius: 8px; }
+  .empty { padding: 24px 16px; text-align: center; }
+  
+    .prod {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 12px;
+      align-items: center;
+  
+      img {
+        width: 68px;
+        height: 68px;
+        border-radius: 8px;
+        object-fit: cover;
+        background: #000;
+      }
+  
+      .meta {
+        .title {
+          font: 700 16px/1.2 'Lexend', system-ui, sans-serif;
+          color: #2e2219;
+          margin-bottom: 4px;
+        }
+        .sub {
+          font: 400 12px/1.2 'Lexend', system-ui, sans-serif;
+          color: #7a6b5e;
+        }
+      }
+    }
+  
+    .qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,.06);
+      border-radius: 10px;
+      padding: 6px;
+  
+      .qbtn {
+        width: 28px;
+        height: 28px;
+        border: 0;
+        border-radius: 8px;
+        background: rgba(0,0,0,.08);
+        color: #2e2219;
+        font: 700 16px/1 'Lexend', system-ui, sans-serif;
+        cursor: pointer;
+        transition: background .15s ease, transform .06s ease;
+        &:hover { background: rgba(0,0,0,.12); }
+        &:active { transform: translateY(1px); }
+      }
+  
+      .qval {
+        min-width: 34px;
+        text-align: center;
+        background: #fff;
+        border-radius: 6px;
+        padding: 6px 8px;
+        font: 700 14px/1 'Lexend', system-ui, sans-serif;
+        color: #2e2219;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+      }
+    }
+  
+    .price {
+      font: 700 16px/1 'Lexend', system-ui, sans-serif;
+      color: #2e2219;
+      white-space: nowrap;
+      width: var(--price-w);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    .trash {
+      border: 0;
+      background: transparent;
+      font-size: 18px;
+      cursor: pointer;
+      opacity: .8;
+      transition: transform .06s ease, opacity .15s ease;
+      &:hover { opacity: 1; }
+      &:active { transform: translateY(1px); }
+    }
+  
+    /* Végösszeg sor */
+    .total {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 16px;
+      padding: 18px 4px 6px;
+  
+      .label {
+        font: 600 22px/1 'Lexend', system-ui, sans-serif;
+        color: #2e2219;
+      }
+      .value {
+        font: 700 clamp(24px, 3.6vw, 36px)/1 'Lexend', system-ui, sans-serif;
+        color: #2e2219;
+        text-align: right;
+      }
+    }
+  
+    /* Checkout blokk (zöld gradient) */
+    .checkout {
+      background: linear-gradient(135deg, #296100 0%, #204108 100%);
+      margin-top: 28px;
+      padding: 40px 0 56px;
+      color: #fff;
+  
+      h3 {
+        margin: 0 0 22px;
+        font-family: 'Playfair Display', serif;
+        font-weight: 400;
+        font-size: clamp(28px, 3.6vw, 40px);
+      }
+  
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+  
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+  
+        /* teljes szélességű elem */
+        .full { grid-column: 1 / -1; }
+      }
+  
+      .input, .textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: none;
+        font: 400 16px/1.2 'Lexend', system-ui, sans-serif;
+        color: #fff;
+        background: rgba(255,255,255,.18);
+        outline: none;
+        transition: box-shadow .15s ease, background .15s ease;
+  
+        &::placeholder { color: rgba(255,255,255,.75); }
+        &:focus {
+          background: rgba(255,255,255,.22);
+          box-shadow: 0 0 0 3px rgba(220,187,87,.35);
+        }
+      }
+  
+      .textarea {
+        min-height: 140px;
+        resize: vertical;
+        grid-column: 1 / -1;
+      }
+  
+      .policy {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: 400 14px/1.4 'Lexend', system-ui, sans-serif;
+        margin-top: 6px;
+  
+        input[type="checkbox"] {
+          appearance: none;
+          width: 18px; height: 18px;
+          border-radius: 4px;
+          background: #fff;
+          border: 2px solid #fff;
+          position: relative;
+          transition: background .15s ease, border-color .15s ease;
+  
+          &:checked {
+            background: #dcbb57;
+            border-color: #dcbb57;
+          }
+          &:checked::after{
+            content:'';
+            position:absolute;
+            left:4px; top:0px;
+            width:5px; height:10px;
+            border: solid #000;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+          }
+        }
+  
+        a { color: #f7e6a9; text-decoration: underline; }
+      }
+  
+      .submit-wrap {
+        display: flex;
+        justify-content: center;
+        margin-top: 18px;
+      }
+  
+      .submit {
+        background: var(--accent);
+        color: var(--text);
+        border: none;
+        padding: 14px 28px;
+        font: 700 16px/1 'Lexend', system-ui, sans-serif;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background .15s ease, transform .06s ease;
+        &:hover { background: #c79a2a; }
+        &:active { transform: translateY(1px); }
+      }
+    }
+  
+    @media (max-width: 860px) {
+      .line { grid-template-columns: 1fr auto auto; }
+      .trash { display: none; }
+    }
+  
+    @media (max-width: 640px) {
+      .row { grid-template-columns: 1fr; }
+    }
+  }

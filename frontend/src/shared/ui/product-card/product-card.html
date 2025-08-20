@@ -9,8 +9,8 @@
     <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
 
     <div class="actions">
-      <button class="cart" type="button">Kosárba</button>
-      <button class="details" type="button">Részletek</button>
+      <button class="cart" type="button" (click)="handleAdd()">Kosárba</button>
+      <button class="details" type="button" (click)="handleDetails()">Részletek</button>
     </div>
   </div>
 </article>

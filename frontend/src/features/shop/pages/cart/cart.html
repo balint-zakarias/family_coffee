@@ -1,2 +1,103 @@
-<h1>Rendelés</h1>
-<p>Itt lesz a kosár és az űrlap.</p>
+<div class="cart-page">
+  <!-- státuszok -->
+  <section *ngIf="loading()" class="status">Betöltés…</section>
+  <section *ngIf="error()" class="status error">Hiba: {{ error() }}</section>
+
+  <!-- üres állapot -->
+  <section class="empty" *ngIf="!loading() && !items().length" style="height:100vh; display:flex; align-items:center; justify-content:center;">
+    A kosarad üres.
+  </section>
+
+  <!-- sorok csak akkor, ha van tétel -->
+  <section class="wrap head" *ngIf="!loading() && items().length">
+    <h1>Rendelés</h1>
+    <h2>Kosár tartalma</h2>
+
+    <div class="lines">
+      <div
+        class="line"
+        *ngFor="let it of items(); trackBy: trackById"
+        [class.busy]="isPending(it.id)"
+        [attr.aria-busy]="isPending(it.id) ? 'true' : 'false'"
+      >
+        <div class="prod">
+          <img [src]="it.imageUrl" [alt]="it.name" />
+          <div class="meta">
+            <div class="title">{{ it.name }}</div>
+            <div class="sub" *ngIf="it.subtitle">{{ it.subtitle }}</div>
+          </div>
+        </div>
+
+        <div class="qty">
+          <button
+            type="button"
+            class="qbtn"
+            (click)="dec(it.id)"
+            [disabled]="isPending(it.id)"
+            [attr.aria-label]="'Mennyiség csökkentése: ' + it.name"
+          >−</button>
+
+          <div class="qval">{{ it.qty }}</div>
+
+          <button
+            type="button"
+            class="qbtn"
+            (click)="inc(it.id)"
+            [disabled]="isPending(it.id)"
+            [attr.aria-label]="'Mennyiség növelése: ' + it.name"
+          >+</button>
+        </div>
+
+        <div class="price">{{ (it.unitPrice * it.qty) | number:'1.0-0' }} Ft</div>
+
+        <button
+          type="button"
+          class="trash"
+          aria-label="Törlés"
+          (click)="remove(it.id)"
+          [disabled]="isPending(it.id)"
+          [attr.aria-label]="'Tétel törlése: ' + it.name"
+        >🗑️</button>
+      </div>
+    </div>
+
+    <div class="total">
+      <div class="label">Végösszeg:</div>
+      <div class="value">{{ total() | number:'1.0-0' }} Ft</div>
+    </div>
+  </section>
+
+  <!-- Adatok / űrlap blokk (marad vizuális) -->
+  <section class="checkout" *ngIf="!loading() && items().length">
+    <div class="wrap">
+      <h3>Adatok</h3>
+      <form class="form" (submit)="$event.preventDefault()">
+        <div class="row">
+          <input type="text" placeholder="Név" class="input full" />
+        </div>
+        <div class="row">
+          <input type="tel" placeholder="Telefon" class="input" />
+          <input type="email" placeholder="E-mail" class="input" />
+        </div>
+        <div class="row">
+          <input type="text" placeholder="Irányítószám" class="input" />
+          <input type="text" placeholder="Település" class="input" />
+        </div>
+        <div class="row">
+          <input type="text" placeholder="Közterület neve" class="input" />
+          <input type="text" placeholder="Házszám" class="input" />
+        </div>
+        <div class="row">
+          <textarea placeholder="Megjegyzés" class="textarea"></textarea>
+        </div>
+        <label class="policy">
+          <input type="checkbox" />
+          Elfogadom az <a href="#">Adatvédelmi Nyilatkozatot</a>
+        </label>
+        <div class="submit-wrap">
+          <button type="submit" class="submit">Rendelés leadása</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
