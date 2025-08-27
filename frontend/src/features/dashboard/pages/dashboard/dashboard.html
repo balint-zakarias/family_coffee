@@ -1,0 +1,108 @@
+<app-dashboard-header></app-dashboard-header>
+
+<main class="dashboard-main">
+  <div class="dashboard-container">
+    
+    <!-- Welcome section -->
+    <section class="welcome-section">
+      <h1>Üdvözöljük a Family Coffee adminisztrációs felületén!</h1>
+      <p>Itt kezelheti a webshop tartalmát, termékeket, rendeléseket és egyéb beállításokat.</p>
+    </section>
+
+    <!-- Quick stats cards -->
+    <section class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-content">
+            <h3>Termékek</h3>
+            <p class="stat-number">--</p>
+            <p class="stat-label">Aktív termék</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-content">
+            <h3>Rendelések</h3>
+            <p class="stat-number">--</p>
+            <p class="stat-label">Mai rendelés</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>Ügyfelek</h3>
+            <p class="stat-number">--</p>
+            <p class="stat-label">Regisztrált ügyfél</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <h3>Bevétel</h3>
+            <p class="stat-number">-- Ft</p>
+            <p class="stat-label">Mai bevétel</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick actions -->
+    <section class="actions-section">
+      <h2>Gyors műveletek</h2>
+      <div class="actions-grid">
+        <button class="action-card" type="button">
+          <div class="action-icon">➕</div>
+          <div class="action-content">
+            <h3>Új termék</h3>
+            <p>Termék hozzáadása a katalógushoz</p>
+          </div>
+        </button>
+
+        <a routerLink="/dashboard/products" class="action-card">
+          <div class="action-icon">📋</div>
+          <div class="action-content">
+            <h3>Termékek kezelése</h3>
+            <p>Termékek megtekintése és szerkesztése</p>
+          </div>
+        </a>
+
+        <button class="action-card" type="button">
+          <div class="action-icon">🛒</div>
+          <div class="action-content">
+            <h3>Rendelések</h3>
+            <p>Rendelések megtekintése és kezelése</p>
+          </div>
+        </button>
+
+        <button class="action-card" type="button">
+          <div class="action-icon">🎨</div>
+          <div class="action-content">
+            <h3>Tartalom szerkesztése</h3>
+            <p>Weboldal tartalmának módosítása</p>
+          </div>
+        </button>
+
+        <button class="action-card" type="button">
+          <div class="action-icon">⚙️</div>
+          <div class="action-content">
+            <h3>Beállítások</h3>
+            <p>Rendszer beállítások kezelése</p>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Recent activity placeholder -->
+    <section class="activity-section">
+      <h2>Legutóbbi tevékenységek</h2>
+      <div class="activity-placeholder">
+        <p>Itt jelennek majd meg a legutóbbi rendszeresemények és módosítások.</p>
+      </div>
+    </section>
+
+  </div>
+</main>

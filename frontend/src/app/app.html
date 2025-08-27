@@ -1,4 +1,4 @@
-<app-header></app-header>
+<app-header *ngIf="showHeaderFooter$ | async"></app-header>
 <router-outlet></router-outlet>
-<app-footer></app-footer>
-<app-cookie-banner></app-cookie-banner>
+<app-footer *ngIf="showHeaderFooter$ | async"></app-footer>
+<app-cookie-banner *ngIf="showHeaderFooter$ | async"></app-cookie-banner>

@@ -1,0 +1,210 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f2ec 0%, #e8ddd0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+
+  .login-container {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .login-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 
+      0 10px 25px rgba(0, 0, 0, 0.1),
+      0 4px 10px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+
+    // Subtle background pattern
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #8B4513 0%, #D2691E  50%, #8B4513 100%);
+    }
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #2e2219;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      font-family: 'Lexend', system-ui, sans-serif;
+      font-size: 0.95rem;
+      color: #7a6b5e;
+      margin: 0;
+      font-weight: 400;
+    }
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .error-message {
+    background: #fee;
+    border: 1px solid #fbb;
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    color: #8a1c1c;
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2e2219;
+    margin: 0;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e3d7c9;
+    border-radius: 10px;
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-size: 1rem;
+    color: #2e2219;
+    background: #fff;
+    transition: all 0.2s ease;
+    outline: none;
+
+    &::placeholder {
+      color: #a0958a;
+    }
+
+    &:focus {
+      border-color: #8B4513;
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    }
+
+    &:disabled {
+      background: #f8f6f3;
+      color: #a0958a;
+      cursor: not-allowed;
+    }
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: #fff;
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      background: #d0c4b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    &.loading {
+      pointer-events: none;
+    }
+  }
+
+  .loading-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e3d7c9;
+
+    p {
+      font-family: 'Lexend', system-ui, sans-serif;
+      font-size: 0.85rem;
+      color: #a0958a;
+      margin: 0;
+      font-weight: 400;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 480px) {
+    padding: 1rem 0.5rem;
+
+    .login-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .login-header h1 {
+      font-size: 2rem;
+    }
+  }
+
+  // Focus styles for accessibility
+  .form-input:focus-visible,
+  .login-button:focus-visible {
+    outline: 2px solid #8B4513;
+    outline-offset: 2px;
+  }
+}

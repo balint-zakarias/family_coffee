@@ -1,0 +1,197 @@
+<app-dashboard-header></app-dashboard-header>
+
+<main class="products-main">
+  <div class="products-container">
+    
+    <!-- Page header -->
+    <section class="page-header">
+      <div class="header-content">
+        <h1>Termékek kezelése</h1>
+        <p>Itt kezelheti a webshop termékeit, szerkesztheti az adatokat és követheti a készleteket.</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-primary">
+          <span class="btn-icon">➕</span>
+          Új termék
+        </button>
+      </div>
+    </section>
+
+    <!-- Filters section -->
+    <section class="filters-section">
+      <div class="filters-grid">
+        <!-- Search -->
+        <div class="filter-group">
+          <label for="search" class="filter-label">Keresés</label>
+          <input
+            type="text"
+            id="search"
+            class="filter-input"
+            placeholder="Termék neve, leírás vagy SKU..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($any($event.target).value)"
+          />
+        </div>
+
+        <!-- Category filter -->
+        <div class="filter-group">
+          <label for="category" class="filter-label">Kategória</label>
+          <select
+            id="category"
+            class="filter-select"
+            [value]="selectedCategoryId() || ''"
+            (change)="onCategoryChange($any($event.target).value)"
+          >
+            <option value="">Minden kategória</option>
+            <option 
+              *ngFor="let category of categories()" 
+              [value]="category.id"
+            >
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Show inactive -->
+        <div class="filter-group">
+          <label class="filter-checkbox">
+            <input
+              type="checkbox"
+              [checked]="showInactiveProducts()"
+              (change)="onShowInactiveChange($any($event.target).checked)"
+            />
+            <span class="checkbox-label">Inaktív termékek megjelenítése</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading state -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Termékek betöltése...</p>
+    </section>
+
+    <!-- Error state -->
+    <section *ngIf="error()" class="error-section">
+      <div class="error-icon">⚠️</div>
+      <h3>Hiba történt</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn-secondary" (click)="loadData()">
+        Újrapróbálás
+      </button>
+    </section>
+
+    <!-- Products table -->
+    <section *ngIf="!loading() && !error()" class="products-section">
+      <div class="products-header">
+        <h2>Termékek ({{ products().length }})</h2>
+      </div>
+
+      <div class="products-table-container" *ngIf="products().length > 0">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Kép</th>
+              <th>Termék</th>
+              <th>Kategória</th>
+              <th>SKU</th>
+              <th>Ár</th>
+              <th>Készlet</th>
+              <th>Státusz</th>
+              <th>Létrehozva</th>
+              <th>Műveletek</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products(); trackBy: trackByProductId" class="product-row">
+              <!-- Product image -->
+              <td class="product-image-cell">
+                <img 
+                  [src]="getProductImageUrl(product)" 
+                  [alt]="product.name"
+                  class="product-image"
+                  loading="lazy"
+                />
+              </td>
+
+              <!-- Product info -->
+              <td class="product-info-cell">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-description" *ngIf="product.description">
+                  {{ product.description.length > 100 ? (product.description | slice:0:100) + '...' : product.description }}
+                </div>
+              </td>
+
+              <!-- Category -->
+              <td class="category-cell">
+                <span class="category-badge" *ngIf="product.category">
+                  {{ product.category.name }}
+                </span>
+                <span class="no-category" *ngIf="!product.category">
+                  Nincs kategória
+                </span>
+              </td>
+
+              <!-- SKU -->
+              <td class="sku-cell">
+                <code class="sku-code">{{ product.sku }}</code>
+              </td>
+
+              <!-- Price -->
+              <td class="price-cell">
+                <span class="price">{{ product.price | currency:'HUF':'symbol':'1.0-0' }}</span>
+              </td>
+
+              <!-- Stock -->
+              <td class="stock-cell">
+                <span class="stock-badge" [class]="getStockStatusClass(product.stockQty)">
+                  {{ product.stockQty }} db
+                </span>
+                <div class="stock-status">{{ getStockStatusText(product.stockQty) }}</div>
+              </td>
+
+              <!-- Status -->
+              <td class="status-cell">
+                <span class="status-badge" [class.active]="product.isActive" [class.inactive]="!product.isActive">
+                  {{ product.isActive ? 'Aktív' : 'Inaktív' }}
+                </span>
+              </td>
+
+              <!-- Created date -->
+              <td class="date-cell">
+                {{ product.createdAt | date:'yyyy.MM.dd' }}
+              </td>
+
+              <!-- Actions -->
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <button type="button" class="action-btn edit" title="Szerkesztés">
+                    ✏️
+                  </button>
+                  <button type="button" class="action-btn view" title="Megtekintés">
+                    👁️
+                  </button>
+                  <button type="button" class="action-btn delete" title="Törlés">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="products().length === 0">
+        <div class="empty-icon">📦</div>
+        <h3>Nincsenek termékek</h3>
+        <p>A megadott szűrőknek megfelelő termékek nem találhatók.</p>
+        <button type="button" class="btn btn-primary">
+          Új termék hozzáadása
+        </button>
+      </div>
+    </section>
+
+  </div>
+</main>

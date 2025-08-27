@@ -1,0 +1,45 @@
+<header class="dashboard-header">
+  <div class="header-content">
+    <!-- Brand/Logo section -->
+    <div class="brand-section">
+      <h1 class="brand-title">Family Coffee</h1>
+      <span class="admin-label">Adminisztráció</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="dashboard-nav" aria-label="Dashboard navigáció">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Dashboard</a>
+      <a routerLink="/dashboard/products" routerLinkActive="active" class="nav-link">Termékek</a>
+      <a href="#" class="nav-link">Rendelések</a>
+      <a href="#" class="nav-link">Tartalom</a>
+    </nav>
+
+    <!-- User section -->
+    <div class="user-section" *ngIf="user">
+      <div class="user-info">
+        <span class="user-name">{{ getUserDisplayName() }}</span>
+        <span class="user-role" *ngIf="user.is_superuser">Szuperadmin</span>
+        <span class="user-role" *ngIf="!user.is_superuser && user.is_staff">Admin</span>
+      </div>
+      
+      <div class="user-actions">
+        <button 
+          type="button" 
+          class="action-btn secondary" 
+          (click)="goToMainSite()"
+          title="Vissza a főoldalra"
+        >
+          Főoldal
+        </button>
+        <button 
+          type="button" 
+          class="action-btn primary" 
+          (click)="logout()"
+          title="Kijelentkezés"
+        >
+          Kijelentkezés
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
