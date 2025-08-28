@@ -1,0 +1,74 @@
+<!-- Page Header -->
+<app-dashboard-header 
+  title="Beállítások" 
+  subtitle="Rendszer beállítások kezelése"
+></app-dashboard-header>
+
+<main class="settings-main">
+  <div class="settings-container">
+
+    <!-- Loading -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Beállítások betöltése...</p>
+    </section>
+
+    <!-- Settings Form -->
+    <section *ngIf="!loading()" class="form-section">
+      <div class="form-container">
+        <h2>E-mail beállítások</h2>
+        
+        <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form">
+          
+          <div class="form-group">
+            <label for="merchantOrderEmail" class="form-label">
+              Rendelés értesítő e-mail cím *
+            </label>
+            <input
+              id="merchantOrderEmail"
+              type="email"
+              class="form-input"
+              formControlName="merchantOrderEmail"
+              placeholder="rendeles@familycoffee.hu"
+              [class.error]="settingsForm.get('merchantOrderEmail')?.invalid && settingsForm.get('merchantOrderEmail')?.touched"
+            />
+            <p class="form-help">
+              Erre az e-mail címre érkeznek az új rendelés értesítések. (Kötelező mező)
+            </p>
+            <div *ngIf="settingsForm.get('merchantOrderEmail')?.invalid && settingsForm.get('merchantOrderEmail')?.touched" class="form-error">
+              <span *ngIf="settingsForm.get('merchantOrderEmail')?.errors?.['required']">
+                Az e-mail cím megadása kötelező.
+              </span>
+              <span *ngIf="settingsForm.get('merchantOrderEmail')?.errors?.['email']">
+                Kérjük, adjon meg egy érvényes e-mail címet.
+              </span>
+            </div>
+          </div>
+
+          <!-- Success message -->
+          <div *ngIf="success()" class="success-message">
+            ✅ Beállítások sikeresen mentve!
+          </div>
+
+          <!-- Error message -->
+          <div *ngIf="error()" class="error-message">
+            ⚠️ {{ error() }}
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!canSubmit"
+            >
+              <span *ngIf="saving()" class="loading-spinner"></span>
+              {{ saving() ? 'Mentés...' : 'Beállítások mentése' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+  </div>
+</main>

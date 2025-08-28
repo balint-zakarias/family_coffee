@@ -1,0 +1,146 @@
+<!-- Page Header -->
+<app-dashboard-header 
+  title="Tartalom szerkesztése" 
+  subtitle="Weboldal tartalmának módosítása"
+></app-dashboard-header>
+
+<main class="content-main">
+  <div class="content-container">
+
+    <!-- Loading -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Tartalom betöltése...</p>
+    </section>
+
+    <!-- Content Form -->
+    <section *ngIf="!loading()" class="form-section">
+      <div class="form-container">
+        
+        <form [formGroup]="contentForm" (ngSubmit)="onSubmit()" class="content-form">
+          
+          <!-- Hero Section -->
+          <div class="form-section-group">
+            <h2>Főoldal Hero szekció</h2>
+            
+            <div class="form-group">
+              <label for="heroTitle" class="form-label">
+                Főcím *
+              </label>
+              <input
+                id="heroTitle"
+                type="text"
+                class="form-input"
+                formControlName="heroTitle"
+                placeholder="Üdvözöljük a Family Coffee-ban!"
+                [class.error]="contentForm.get('heroTitle')?.invalid && contentForm.get('heroTitle')?.touched"
+              />
+              <div *ngIf="contentForm.get('heroTitle')?.invalid && contentForm.get('heroTitle')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('heroTitle')?.errors?.['required']">
+                  A főcím megadása kötelező.
+                </span>
+                <span *ngIf="contentForm.get('heroTitle')?.errors?.['maxlength']">
+                  A főcím maximum 200 karakter lehet.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="heroSubtitle" class="form-label">
+                Alcím *
+              </label>
+              <textarea
+                id="heroSubtitle"
+                class="form-textarea"
+                formControlName="heroSubtitle"
+                placeholder="Prémium kávék és kiegészítők széles választéka..."
+                rows="3"
+                [class.error]="contentForm.get('heroSubtitle')?.invalid && contentForm.get('heroSubtitle')?.touched"
+              ></textarea>
+              <div *ngIf="contentForm.get('heroSubtitle')?.invalid && contentForm.get('heroSubtitle')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('heroSubtitle')?.errors?.['required']">
+                  Az alcím megadása kötelező.
+                </span>
+                <span *ngIf="contentForm.get('heroSubtitle')?.errors?.['maxlength']">
+                  Az alcím maximum 300 karakter lehet.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- About Section -->
+          <div class="form-section-group">
+            <h2>Rólunk szekció</h2>
+            
+            <div class="form-group">
+              <label for="aboutTitle" class="form-label">
+                Szekció címe *
+              </label>
+              <input
+                id="aboutTitle"
+                type="text"
+                class="form-input"
+                formControlName="aboutTitle"
+                placeholder="Rólunk"
+                [class.error]="contentForm.get('aboutTitle')?.invalid && contentForm.get('aboutTitle')?.touched"
+              />
+              <div *ngIf="contentForm.get('aboutTitle')?.invalid && contentForm.get('aboutTitle')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('aboutTitle')?.errors?.['required']">
+                  A szekció címe kötelező.
+                </span>
+                <span *ngIf="contentForm.get('aboutTitle')?.errors?.['maxlength']">
+                  A cím maximum 200 karakter lehet.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="aboutBody" class="form-label">
+                Szekció szövege *
+              </label>
+              <textarea
+                id="aboutBody"
+                class="form-textarea large"
+                formControlName="aboutBody"
+                placeholder="A Family Coffee története..."
+                rows="8"
+                [class.error]="contentForm.get('aboutBody')?.invalid && contentForm.get('aboutBody')?.touched"
+              ></textarea>
+              <div *ngIf="contentForm.get('aboutBody')?.invalid && contentForm.get('aboutBody')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('aboutBody')?.errors?.['required']">
+                  A szekció szövege kötelező.
+                </span>
+                <span *ngIf="contentForm.get('aboutBody')?.errors?.['maxlength']">
+                  A szöveg maximum 2000 karakter lehet.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success message -->
+          <div *ngIf="success()" class="success-message">
+            ✅ Tartalom sikeresen mentve!
+          </div>
+
+          <!-- Error message -->
+          <div *ngIf="error()" class="error-message">
+            ⚠️ {{ error() }}
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!canSubmit"
+            >
+              <span *ngIf="saving()" class="loading-spinner"></span>
+              {{ saving() ? 'Mentés...' : 'Tartalom mentése' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+  </div>
+</main>

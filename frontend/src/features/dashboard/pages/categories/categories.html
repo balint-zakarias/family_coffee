@@ -1,0 +1,150 @@
+<!-- Page Header -->
+<app-dashboard-header 
+  title="Kategóriák kezelése" 
+  subtitle="Termék kategóriák létrehozása és szerkesztése"
+></app-dashboard-header>
+
+<main class="categories-main">
+  <div class="categories-container">
+
+    <!-- Add/Edit Form -->
+    <section class="form-section">
+      <div class="form-container">
+        <h2>{{ isEditing ? 'Kategória szerkesztése' : 'Új kategória' }}</h2>
+        
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="category-form">
+          
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Kategória neve *
+            </label>
+            <input
+              id="name"
+              type="text"
+              class="form-input"
+              formControlName="name"
+              placeholder="pl. Kávék, Kiegészítők"
+              [class.error]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+            />
+            <div *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched" class="form-error">
+              <span *ngIf="categoryForm.get('name')?.errors?.['required']">
+                A kategória neve kötelező.
+              </span>
+              <span *ngIf="categoryForm.get('name')?.errors?.['maxlength']">
+                A név maximum 120 karakter lehet.
+              </span>
+            </div>
+          </div>
+
+          <!-- Success message -->
+          <div *ngIf="success()" class="success-message">
+            ✅ {{ isEditing ? 'Kategória sikeresen frissítve!' : 'Kategória sikeresen létrehozva!' }}
+          </div>
+
+          <!-- Error message -->
+          <div *ngIf="error()" class="error-message">
+            ⚠️ {{ error() }}
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!canSubmit"
+            >
+              <span *ngIf="saving()" class="loading-spinner"></span>
+              {{ saving() ? 'Mentés...' : (isEditing ? 'Frissítés' : 'Létrehozás') }}
+            </button>
+            
+            <button 
+              *ngIf="isEditing"
+              type="button" 
+              class="btn btn-secondary"
+              (click)="cancelEdit()"
+            >
+              Mégse
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- Categories List -->
+    <section class="list-section">
+      <div class="list-container">
+        <h2>Meglévő kategóriák</h2>
+
+        <!-- Loading -->
+        <div *ngIf="loading()" class="loading-section">
+          <div class="loading-spinner"></div>
+          <p>Kategóriák betöltése...</p>
+        </div>
+
+        <!-- Categories Table -->
+        <div *ngIf="!loading() && categories().length > 0" class="categories-table">
+          <div class="table-header">
+            <div class="col-name">Név</div>
+            <div class="col-slug">Slug</div>
+            <div class="col-actions">Műveletek</div>
+          </div>
+          
+          <div class="table-row" *ngFor="let category of categories()">
+            <div class="col-name">{{ category.name }}</div>
+            <div class="col-slug">{{ category.slug }}</div>
+            <div class="col-actions">
+              <button 
+                type="button" 
+                class="btn btn-sm btn-edit"
+                (click)="editCategory(category)"
+              >
+                Szerkesztés
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-sm btn-delete"
+                (click)="openDeleteModal(category)"
+              >
+                Törlés
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading() && categories().length === 0" class="empty-state">
+          <p>Még nincsenek kategóriák. Hozza létre az elsőt!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Global Error Section (for delete errors) -->
+    <section *ngIf="error() && !loading()" class="error-section">
+      <div class="error-container">
+        <div class="error-message">
+          ⚠️ {{ error() }}
+        </div>
+        <button 
+          type="button" 
+          class="btn btn-secondary btn-sm"
+          (click)="error.set(null)"
+        >
+          Bezárás
+        </button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteModal()"
+  title="Kategória törlése"
+  [message]="'Biztosan törölni szeretné a(z) &quot;' + (categoryToDelete()?.name || '') + '&quot; kategóriát? Ez a művelet nem vonható vissza.'"
+  confirmText="Törlés"
+  cancelText="Mégse"
+  [isDangerous]="true"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()">
+</app-confirmation-modal>

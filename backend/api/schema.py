@@ -6,7 +6,7 @@ from django.utils.text import slugify
 
 from catalog.models import Category, Product, ProductImage
 from orders.models import Order, OrderItem
-from contentapp.models import SiteContent
+from contentapp.models import SiteContent, SiteSettings
 from contact.models import ContactMessage
 from cart.models import Cart, CartItem
 from cart.utils import get_or_create_cart
@@ -134,6 +134,11 @@ class OrderType(DjangoObjectType):
             "items",
         )
 
+class SiteSettingsType(DjangoObjectType):
+    class Meta:
+        model = SiteSettings
+        fields = ("id", "merchant_order_email", "created_at", "updated_at")
+
 class ContactMessageType(DjangoObjectType):
     class Meta:
         model = ContactMessage
@@ -189,6 +194,7 @@ class Query(graphene.ObjectType):
 
     # Tartalom
     site_content = graphene.Field(SiteContentType, description="Nyitóoldal tartalom (singleton)")
+    site_settings = graphene.Field(SiteSettingsType, description="Oldal beállítások (singleton)")
 
     # Kategóriák
     categories = graphene.List(CategoryType, description="Minden kategória név szerinti rendezésben")
@@ -249,6 +255,9 @@ class Query(graphene.ObjectType):
 
     def resolve_site_content(self, info):
         return SiteContent.objects.first()
+
+    def resolve_site_settings(self, info):
+        return SiteSettings.objects.first()
 
     def resolve_categories(self, info):
         return Category.objects.order_by("name").all()
@@ -552,6 +561,126 @@ class CreateOrder(graphene.Mutation):
         except Exception as e:
             raise Exception(str(e))
 
+class UpdateSiteSettings(graphene.Mutation):
+    class Arguments:
+        merchant_order_email = graphene.String()
+
+    site_settings = graphene.Field(SiteSettingsType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, merchant_order_email=None):
+        try:
+            settings, created = SiteSettings.objects.get_or_create(
+                defaults={'merchant_order_email': merchant_order_email}
+            )
+            
+            if not created and merchant_order_email is not None:
+                settings.merchant_order_email = merchant_order_email
+                settings.save()
+            
+            return UpdateSiteSettings(site_settings=settings, success=True)
+        except Exception as e:
+            raise Exception(str(e))
+
+class UpdateSiteContent(graphene.Mutation):
+    class Arguments:
+        hero_title = graphene.String()
+        hero_subtitle = graphene.String()
+        about_title = graphene.String()
+        about_body = graphene.String()
+
+    site_content = graphene.Field(SiteContentType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, hero_title=None, hero_subtitle=None, about_title=None, about_body=None):
+        try:
+            # Get or create the singleton SiteContent
+            content, created = SiteContent.objects.get_or_create(
+                defaults={
+                    'hero_title': hero_title or '',
+                    'hero_subtitle': hero_subtitle or '',
+                    'about_title': about_title or '',
+                    'about_body': about_body or ''
+                }
+            )
+            
+            # If not created, update the existing one
+            if not created:
+                if hero_title is not None:
+                    content.hero_title = hero_title
+                if hero_subtitle is not None:
+                    content.hero_subtitle = hero_subtitle
+                if about_title is not None:
+                    content.about_title = about_title
+                if about_body is not None:
+                    content.about_body = about_body
+                content.save()
+            
+            return UpdateSiteContent(site_content=content, success=True)
+        except Exception as e:
+            raise Exception(str(e))
+
+class CreateCategory(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, name):
+        try:
+            from django.utils.text import slugify
+            category = Category.objects.create(
+                name=name,
+                slug=slugify(name)
+            )
+            return CreateCategory(category=category, success=True)
+        except Exception as e:
+            raise Exception(str(e))
+
+class UpdateCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int(required=True)
+        name = graphene.String(required=True)
+
+    category = graphene.Field(CategoryType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, name):
+        try:
+            from django.utils.text import slugify
+            category = Category.objects.get(id=id)
+            category.name = name
+            category.slug = slugify(name)
+            category.save()
+            return UpdateCategory(category=category, success=True)
+        except Category.DoesNotExist:
+            raise Exception("Kategória nem található")
+        except Exception as e:
+            raise Exception(str(e))
+
+class DeleteCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        try:
+            category = Category.objects.get(id=id)
+            
+            # Check if category has products
+            product_count = category.products.count()
+            if product_count > 0:
+                raise Exception(f"A kategória nem törölhető, mert {product_count} termék tartozik hozzá. Kérjük, helyezze át a termékeket másik kategóriába, mielőtt törölné a kategóriát.")
+            
+            category.delete()
+            return DeleteCategory(success=True)
+        except Category.DoesNotExist:
+            raise Exception("Kategória nem található")
+        except Exception as e:
+            raise Exception(str(e))
+
 class Mutation(graphene.ObjectType):
     create_contact_message = CreateContactMessage.Field()
 
@@ -565,6 +694,12 @@ class Mutation(graphene.ObjectType):
     
     update_order_status = UpdateOrderStatus.Field()
     create_order = CreateOrder.Field()
+    update_site_settings = UpdateSiteSettings.Field()
+    update_site_content = UpdateSiteContent.Field()
+    
+    create_category = CreateCategory.Field()
+    update_category = UpdateCategory.Field()
+    delete_category = DeleteCategory.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
