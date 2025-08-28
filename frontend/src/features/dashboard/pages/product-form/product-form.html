@@ -1,0 +1,196 @@
+<app-dashboard-header></app-dashboard-header>
+
+<main class="product-form-main">
+  <div class="product-form-container">
+    
+    <!-- Page header -->
+    <section class="page-header">
+      <div class="header-content">
+        <h1>{{ title }}</h1>
+        <nav class="breadcrumb">
+          <a routerLink="/dashboard/products">Termékek</a>
+          <span class="separator">›</span>
+          <span>{{ title }}</span>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Loading state -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Termék betöltése...</p>
+    </section>
+
+    <!-- Error state -->
+    <section *ngIf="error()" class="error-section">
+      <div class="error-icon">⚠️</div>
+      <h3>Hiba történt</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn-secondary" (click)="loadProduct()">
+        Újrapróbálás
+      </button>
+    </section>
+
+    <!-- Product form -->
+    <section *ngIf="!loading() && !error()" class="form-section">
+      <form (ngSubmit)="onSubmit()" #productForm="ngForm">
+        
+        <div class="form-grid">
+          
+          <!-- Basic info -->
+          <div class="form-group">
+            <label for="name" class="form-label">Termék neve *</label>
+            <input
+              type="text"
+              id="name"
+              class="form-input"
+              [(ngModel)]="product().name"
+              name="name"
+              [readonly]="isReadonly"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="sku" class="form-label">Cikkszám *</label>
+            <input
+              type="text"
+              id="sku"
+              class="form-input"
+              [(ngModel)]="product().sku"
+              name="sku"
+              [readonly]="isReadonly"
+              required
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description" class="form-label">Leírás</label>
+            <textarea
+              id="description"
+              class="form-textarea"
+              [(ngModel)]="product().description"
+              name="description"
+              [readonly]="isReadonly"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <!-- Pricing & inventory -->
+          <div class="form-group">
+            <label for="price" class="form-label">Ár (HUF) *</label>
+            <input
+              type="number"
+              id="price"
+              class="form-input"
+              [(ngModel)]="product().price"
+              name="price"
+              [readonly]="isReadonly"
+              min="0"
+              step="1"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="stockQty" class="form-label">Készlet (db) *</label>
+            <input
+              type="number"
+              id="stockQty"
+              class="form-input"
+              [(ngModel)]="product().stockQty"
+              name="stockQty"
+              [readonly]="isReadonly"
+              min="0"
+              step="1"
+              required
+            />
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label for="category" class="form-label">Kategória</label>
+            <select
+              id="category"
+              class="form-select"
+              [(ngModel)]="product().categoryId"
+              name="categoryId"
+              [disabled]="isReadonly"
+            >
+              <option [value]="null">Válasszon kategóriát</option>
+              <option 
+                *ngFor="let category of categories()" 
+                [value]="category.id"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Image URL -->
+          <div class="form-group">
+            <label for="imageUrl" class="form-label">Kép URL</label>
+            <input
+              type="url"
+              id="imageUrl"
+              class="form-input"
+              [(ngModel)]="product().imageUrl"
+              name="imageUrl"
+              [readonly]="isReadonly"
+            />
+          </div>
+
+          <!-- Image preview -->
+          <div class="form-group">
+            <label class="form-label">Kép előnézet</label>
+            <div class="image-preview">
+              <img 
+                *ngIf="product().imageUrl" 
+                [src]="product().imageUrl" 
+                [alt]="product().name"
+                class="preview-image"
+                (error)="onImageError($event)"
+              />
+              <div *ngIf="!product().imageUrl" class="no-image">
+                <span class="no-image-icon">🖼️</span>
+                <span class="no-image-text">Nincs kép</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label class="form-checkbox">
+              <input
+                type="checkbox"
+                [(ngModel)]="product().isActive"
+                name="isActive"
+                [disabled]="isReadonly"
+              />
+              <span class="checkbox-label">Aktív termék</span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Form actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            {{ isReadonly ? 'Vissza' : 'Mégse' }}
+          </button>
+          <button 
+            *ngIf="!isReadonly" 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="saving() || !productForm.valid"
+          >
+            <span *ngIf="saving()" class="btn-spinner"></span>
+            {{ mode === 'create' ? 'Létrehozás' : 'Mentés' }}
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+  </div>
+</main>

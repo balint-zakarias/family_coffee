@@ -10,8 +10,8 @@
         <p>Itt kezelheti a webshop termékeit, szerkesztheti az adatokat és követheti a készleteket.</p>
       </div>
       <div class="header-actions">
-        <button type="button" class="btn btn-primary">
-          <span class="btn-icon">➕</span>
+        <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
+          <span class="btn-icon">+</span>
           Új termék
         </button>
       </div>
@@ -27,7 +27,7 @@
             type="text"
             id="search"
             class="filter-input"
-            placeholder="Termék neve, leírás vagy SKU..."
+            placeholder="Termék neve, leírás vagy cikkszám..."
             [value]="searchTerm()"
             (input)="onSearchChange($any($event.target).value)"
           />
@@ -95,7 +95,7 @@
               <th>Kép</th>
               <th>Termék</th>
               <th>Kategória</th>
-              <th>SKU</th>
+              <th>Cikkszám</th>
               <th>Ár</th>
               <th>Készlet</th>
               <th>Státusz</th>
@@ -166,10 +166,10 @@
               <!-- Actions -->
               <td class="actions-cell">
                 <div class="action-buttons">
-                  <button type="button" class="action-btn edit" title="Szerkesztés">
+                  <button type="button" class="action-btn edit" title="Szerkesztés" (click)="navigateToEdit(product)">
                     ✏️
                   </button>
-                  <button type="button" class="action-btn view" title="Megtekintés">
+                  <button type="button" class="action-btn view" title="Megtekintés" (click)="navigateToView(product)">
                     👁️
                   </button>
                   <button type="button" class="action-btn delete" title="Törlés">
@@ -187,7 +187,7 @@
         <div class="empty-icon">📦</div>
         <h3>Nincsenek termékek</h3>
         <p>A megadott szűrőknek megfelelő termékek nem találhatók.</p>
-        <button type="button" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
           Új termék hozzáadása
         </button>
       </div>

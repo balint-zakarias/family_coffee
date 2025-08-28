@@ -196,4 +196,16 @@ export class Products implements OnInit {
   trackByProductId(index: number, product: Product): number {
     return product.id;
   }
+
+  navigateToCreate() {
+    this.router.navigate(['/dashboard/products/new']);
+  }
+
+  navigateToEdit(product: Product) {
+    this.router.navigate(['/dashboard/products', product.slug, 'edit']);
+  }
+
+  navigateToView(product: Product) {
+    this.router.navigate(['/dashboard/products', product.slug, 'view']);
+  }
 }
