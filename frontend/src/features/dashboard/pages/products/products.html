@@ -172,8 +172,13 @@
                   <button type="button" class="action-btn view" title="Megtekintés" (click)="navigateToView(product)">
                     👁️
                   </button>
-                  <button type="button" class="action-btn delete" title="Törlés">
-                    🗑️
+                  <button 
+                    type="button" 
+                    class="action-btn delete" 
+                    [title]="product.isActive ? 'Inaktiválás' : 'Törlés'"
+                    (click)="deleteProduct(product)"
+                  >
+                    {{ product.isActive ? '🚫' : '🗑️' }}
                   </button>
                 </div>
               </td>
@@ -195,3 +200,14 @@
 
   </div>
 </main>
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteModal()"
+  [title]="deleteModalTitle"
+  [message]="deleteModalMessage"
+  [confirmText]="deleteModalConfirmText"
+  [isDangerous]="!productToDelete()?.isActive"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()"
+></app-confirmation-modal>

@@ -111,8 +111,15 @@ export class ProductForm implements OnInit {
       const data = await this.gql.query<{ product: any }>(QUERY, { slug: this.productSlug });
       if (data.product) {
         this.product.set({
-          ...data.product,
-          categoryId: data.product.category?.id || null
+          id: data.product.id,
+          name: data.product.name,
+          description: data.product.description || '',
+          price: data.product.price,
+          imageUrl: data.product.imageUrl,
+          categoryId: data.product.category?.id || null,
+          sku: data.product.sku,
+          stockQty: data.product.stockQty,
+          isActive: data.product.isActive
         });
       }
     } catch (e: any) {
@@ -164,7 +171,13 @@ export class ProductForm implements OnInit {
       }
     `;
 
-    await this.gql.mutate(MUTATION, { input: this.product() });
+    const input = {
+      ...this.product(),
+      id: this.product().id ? parseInt(this.product().id!.toString()) : undefined,
+      categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
+    };
+
+    await this.gql.mutate(MUTATION, { input });
   }
 
   private async updateProduct() {
@@ -174,7 +187,13 @@ export class ProductForm implements OnInit {
       }
     `;
 
-    await this.gql.mutate(MUTATION, { slug: this.productSlug, input: this.product() });
+    const input = {
+      ...this.product(),
+      id: this.product().id ? parseInt(this.product().id!.toString()) : undefined,
+      categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
+    };
+
+    await this.gql.mutate(MUTATION, { slug: this.productSlug, input });
   }
 
   onCancel() {
@@ -187,6 +206,7 @@ export class ProductForm implements OnInit {
       case 'edit': return 'Termék szerkesztése';
       case 'view': return 'Termék megtekintése';
     }
+    return '';
   }
 
   get isReadonly(): boolean {

@@ -20,8 +20,11 @@ export class Hero {
   bgStyle = signal<{[k: string]: string}>({});
   
   ngOnInit() {
+    const finalImageUrl = this.imageUrl || '/assets/hero.png';
+    console.log('Hero image URL:', finalImageUrl);
+    
     this.bgStyle.set({
-      '--hero-bg': `url("${this.imageUrl}")`
+      '--hero-bg': `url("${finalImageUrl}")`
     });
   }
 }

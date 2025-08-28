@@ -52,6 +52,7 @@ export class List implements OnInit {
         products(search: $search, categorySlug: $categorySlug, limit: $limit) {
           id
           name
+          slug
           description
           price
           imageUrl
@@ -105,8 +106,10 @@ export class List implements OnInit {
   }
   
   onViewDetails(p: UiProduct) {
-    // pl. router navigate a termékoldalra
-    // this.router.navigate(['/product', p.slug ?? p.id]);
-    console.log('Részletek:', p);
+    if (!p?.slug){
+      console.error('Nincs slug a termékhez!');
+      return;
+    }
+    this.router.navigate(['/shop/product', p.slug]);
   }
 }

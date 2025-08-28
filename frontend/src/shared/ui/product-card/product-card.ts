@@ -4,6 +4,7 @@ import { DecimalPipe, NgIf } from '@angular/common';
 export type UiProduct = {
   id: string;
   name: string;
+  slug: string;
   price: number;
   description?: string | null;
   imageUrl?: string | null;

@@ -3,6 +3,7 @@ import { Home } from '@features/shop/pages/home/home';
 import { List } from '@features/shop/pages/list/list';
 import { Cart } from '@features/shop/pages/cart/cart';
 import { Webshop } from '@features/shop/pages/webshop/webshop';
+import { Product } from '@features/shop/pages/product/product';
 import { Privacy } from '@features/legal/pages/privacy/privacy';
 import { Login } from '@features/auth/pages/login/login';
 import { Dashboard } from '@features/dashboard/pages/dashboard/dashboard';
@@ -12,6 +13,7 @@ import { ProductForm } from '@features/dashboard/pages/product-form/product-form
 export const routes: Routes = [
   { path: '', component: Home, title: 'FamilyCoffee – Kezdőlap' },
   { path: 'shop', component: Webshop, title: 'Webshop' },
+  { path: 'shop/product/:slug', component: Product, title: 'Termék – FamilyCoffee' },
   { path: 'cart', component: Cart, title: 'Kosár' },
   { path: 'privacy', component: Privacy, title: 'Adatvédelmi nyilatkozat – FamilyCoffee' },
   { path: 'login', component: Login, title: 'Bejelentkezés – FamilyCoffee Admin' },

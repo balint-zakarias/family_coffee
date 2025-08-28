@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgIf, NgFor, CurrencyPipe, DatePipe, SlicePipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
+import { ConfirmationModal } from '@shared/ui/confirmation-modal/confirmation-modal';
 import { Graphql } from '../../../../core/graphql.service';
 
 interface Product {
@@ -32,7 +33,7 @@ interface Category {
 @Component({
   selector: 'page-products',
   standalone: true,
-  imports: [DashboardHeader, NgIf, NgFor, CurrencyPipe, DatePipe, SlicePipe],
+  imports: [DashboardHeader, ConfirmationModal, NgIf, NgFor, CurrencyPipe, DatePipe, SlicePipe],
   templateUrl: './products.html',
   styleUrls: ['./products.scss'],
 })
@@ -46,6 +47,10 @@ export class Products implements OnInit {
   selectedCategoryId = signal<number | null>(null);
   searchTerm = signal<string>('');
   showInactiveProducts = signal<boolean>(false);
+
+  // Modal state
+  showDeleteModal = signal<boolean>(false);
+  productToDelete = signal<Product | null>(null);
 
   constructor(
     private router: Router,
@@ -207,5 +212,63 @@ export class Products implements OnInit {
 
   navigateToView(product: Product) {
     this.router.navigate(['/dashboard/products', product.slug, 'view']);
+  }
+
+  async deleteProduct(product: Product) {
+    this.productToDelete.set(product);
+    this.showDeleteModal.set(true);
+  }
+
+  async confirmDelete() {
+    const product = this.productToDelete();
+    if (!product) return;
+
+    try {
+      const MUTATION = /* GraphQL */ `
+        mutation DeleteProduct($slug: String!) {
+          deleteProduct(slug: $slug) {
+            success
+            deactivated
+          }
+        }
+      `;
+
+      const result = await this.gql.mutate<{ deleteProduct: { success: boolean; deactivated: boolean } }>(
+        MUTATION, 
+        { slug: product.slug }
+      );
+
+      if (result.deleteProduct.success) {
+        this.loadProducts();
+      }
+    } catch (e: any) {
+      this.error.set(e?.message || 'Hiba történt a művelet során');
+    } finally {
+      this.closeDeleteModal();
+    }
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+    this.productToDelete.set(null);
+  }
+
+  get deleteModalTitle(): string {
+    const product = this.productToDelete();
+    return product?.isActive ? 'Termék inaktiválása' : 'Termék törlése';
+  }
+
+  get deleteModalMessage(): string {
+    const product = this.productToDelete();
+    if (!product) return '';
+    
+    return product.isActive 
+      ? `Biztosan inaktiválni szeretné a "${product.name}" terméket?\n\nAz inaktív termék nem jelenik meg a webshopban, de később újra aktiválható.`
+      : `Biztosan véglegesen törölni szeretné a "${product.name}" terméket?\n\nEz a művelet nem vonható vissza!`;
+  }
+
+  get deleteModalConfirmText(): string {
+    const product = this.productToDelete();
+    return product?.isActive ? 'Inaktiválás' : 'Törlés';
   }
 }

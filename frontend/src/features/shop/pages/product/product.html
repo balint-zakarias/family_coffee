@@ -1,0 +1,104 @@
+<main class="product-main">
+  
+  <!-- Loading state -->
+  <section *ngIf="loading()" class="loading-section">
+    <div class="loading-spinner"></div>
+    <p>Termék betöltése...</p>
+  </section>
+
+  <!-- Error state -->
+  <section *ngIf="error()" class="error-section">
+    <div class="error-icon">⚠️</div>
+    <h2>Hiba történt</h2>
+    <p>{{ error() }}</p>
+    <button type="button" class="btn btn-primary" (click)="goBack()">
+      Vissza a webshopba
+    </button>
+  </section>
+
+  <!-- Product details -->
+  <section *ngIf="!loading() && !error() && product()" class="product-section">
+    <div class="product-container">
+      
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a (click)="goBack()" class="breadcrumb-link">Webshop</a>
+        <span class="breadcrumb-separator">›</span>
+        <span *ngIf="product()?.category" class="breadcrumb-item">{{ product()?.category?.name }}</span>
+        <span *ngIf="product()?.category" class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">{{ product()?.name }}</span>
+      </nav>
+
+      <div class="product-content">
+        
+        <!-- Product image -->
+        <div class="product-image-section">
+          <img 
+            [src]="getProductImageUrl()" 
+            [alt]="product()?.name"
+            class="product-image"
+          />
+        </div>
+
+        <!-- Product info -->
+        <div class="product-info-section">
+          <div class="product-header">
+            <h1 class="product-title">{{ product()?.name }}</h1>
+            <div class="product-price">{{ product()?.price | number:'1.0-0' }} Ft</div>
+          </div>
+
+          <div class="product-meta">
+            <div class="product-category" *ngIf="product()?.category">
+              <span class="meta-label">Kategória:</span>
+              <span class="meta-value">{{ product()?.category?.name }}</span>
+            </div>
+            <div class="product-sku">
+              <span class="meta-label">Cikkszám:</span>
+              <span class="meta-value">{{ product()?.sku }}</span>
+            </div>
+          </div>
+
+          <div class="product-description" *ngIf="product()?.description">
+            <h3>Leírás</h3>
+            <p>{{ product()?.description }}</p>
+          </div>
+
+          <!-- Add to cart section -->
+          <div class="add-to-cart-section" *ngIf="product()?.stockQty && (product()?.stockQty || 0) > 0">
+            <div class="quantity-selector">
+              <label class="quantity-label">Mennyiség:</label>
+              <div class="quantity-controls">
+                <button type="button" class="quantity-btn" (click)="decreaseQuantity()">−</button>
+                <input 
+                  type="number" 
+                  class="quantity-input"
+                  [(ngModel)]="quantity"
+                  min="1"
+                  [max]="product()?.stockQty || 1"
+                />
+                <button type="button" class="quantity-btn" (click)="increaseQuantity()">+</button>
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              class="btn btn-primary btn-add-to-cart"
+              (click)="addToCart()"
+              [disabled]="addingToCart()"
+            >
+              <span *ngIf="addingToCart()" class="btn-spinner"></span>
+              {{ addingToCart() ? 'Hozzáadás...' : 'Kosárba' }}
+            </button>
+          </div>
+
+          <!-- Out of stock -->
+          <div class="out-of-stock" *ngIf="!product()?.stockQty || product()?.stockQty === 0">
+            <p>Ez a termék jelenleg nincs készleten.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
