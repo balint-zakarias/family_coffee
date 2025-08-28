@@ -1,6 +1,8 @@
 import { Component, signal, computed } from '@angular/core';
 import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from 'core/cart.service';
+import { Graphql } from '../../../../core/graphql.service';
 
 type UiCartItem = {
   id: number;
@@ -33,18 +35,22 @@ type GqlCart = {
 @Component({
   selector: 'page-cart',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe],
+  imports: [NgFor, NgIf, DecimalPipe, ReactiveFormsModule],
   templateUrl: './cart.html',
   styleUrls: ['./cart.scss']
 })
-
-
 
 export class Cart {
   loading = signal<boolean>(false);
   error   = signal<string | null>(null);
   items = signal<UiCartItem[]>([]);
   readonly deleteIcon = signal('/assets/trashcan.png');
+
+  // Order form
+  orderForm: FormGroup;
+  orderLoading = signal<boolean>(false);
+  orderSuccess = signal<boolean>(false);
+  orderError = signal<string | null>(null);
 
   private pending = signal<Set<number>>(new Set());
   isPending = (id: number) => this.pending().has(id);
@@ -56,7 +62,18 @@ export class Cart {
     });
   }
 
-  constructor(private cartService: CartService) {
+  constructor(private cartService: CartService, private fb: FormBuilder, private gql: Graphql) {
+    this.orderForm = this.fb.group({
+      customerName: ['', [Validators.required, Validators.maxLength(160)]],
+      customerEmail: ['', [Validators.email]],
+      customerPhone: ['', [Validators.required]],
+      shippingAddress: ['', [Validators.required, Validators.maxLength(300)]],
+      shippingCity: ['', [Validators.required, Validators.maxLength(120)]],
+      shippingZip: ['', [Validators.required, Validators.maxLength(20)]],
+      deliveryNotes: ['', [Validators.maxLength(300)]],
+      acceptedPolicy: [false, [Validators.requiredTrue]]
+    });
+
     this.cartService
       .fetch()
       .then(({ cart }) => {
@@ -155,4 +172,65 @@ export class Cart {
   }
 
   trackById(index: number, item: UiCartItem) { return item.id; }
+
+  async onSubmitOrder() {
+    this.orderSuccess.set(false);
+    this.orderError.set(null);
+
+    if (!this.orderForm.valid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.items().length === 0) {
+      this.orderError.set('A kosár üres');
+      return;
+    }
+
+    this.orderLoading.set(true);
+
+    const MUTATION = /* GraphQL */ `
+      mutation CreateOrder($input: OrderInput!) {
+        createOrder(input: $input) {
+          order {
+            id
+            customerName
+            grandTotal
+          }
+        }
+      }
+    `;
+
+    try {
+      const formData = this.orderForm.value;
+      const orderInput = {
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail || null,
+        customerPhone: formData.customerPhone,
+        shippingAddress: formData.shippingAddress,
+        shippingCity: formData.shippingCity,
+        shippingZip: formData.shippingZip,
+        deliveryNotes: formData.deliveryNotes || '',
+        grandTotal: this.total()
+      };
+
+      await this.gql.mutate(MUTATION, { input: orderInput });
+
+      this.orderSuccess.set(true);
+      setTimeout(() => this.orderSuccess.set(false), 3000);
+      
+      // Clear cart and form
+      this.items.set([]);
+      this.orderForm.reset({ acceptedPolicy: false });
+      
+    } catch (e: any) {
+      this.orderError.set(e?.message || 'Hiba történt a rendelés leadása során');
+    } finally {
+      this.orderLoading.set(false);
+    }
+  }
+
+  get canSubmitOrder(): boolean {
+    return this.orderForm.valid && !this.orderLoading() && this.items().length > 0;
+  }
 }

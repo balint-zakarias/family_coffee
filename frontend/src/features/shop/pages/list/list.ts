@@ -61,7 +61,7 @@ export class List implements OnInit {
     `;
 
     try {
-      const variables: any = { search: this.search(), limit: 12 };
+      const variables: any = { search: this.search()};
       if (this.selectedCategory()) variables.categorySlug = this.selectedCategory();
 
       const data = await this.gql.query<{products: UiProduct[]}>(

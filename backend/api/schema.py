@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from django.db.models import Q,  Sum
 from django.conf import settings
+from django.utils.text import slugify
 
 from catalog.models import Category, Product, ProductImage
 from orders.models import Order, OrderItem
@@ -105,6 +106,10 @@ class OrderItemType(DjangoObjectType):
             "created_at",
         )
 
+class DashboardStatsType(graphene.ObjectType):
+    active_products_count = graphene.Int()
+    total_orders_count = graphene.Int()
+    delivered_orders_revenue = graphene.Decimal()
 
 class OrderType(DjangoObjectType):
     class Meta:
@@ -163,6 +168,19 @@ class CartSummaryType(graphene.ObjectType):
     count = graphene.Int(required=True)
     subtotal = graphene.Decimal(required=True)
 
+# ============ Input Types ============
+
+class ProductInput(graphene.InputObjectType):
+    id = graphene.Int()
+    name = graphene.String(required=True)
+    description = graphene.String()
+    price = graphene.Decimal(required=True)
+    imageUrl = graphene.String()
+    categoryId = graphene.Int()
+    sku = graphene.String(required=True)
+    stockQty = graphene.Int(required=True)
+    isActive = graphene.Boolean()
+
 # ============ Queries ============
 
 class Query(graphene.ObjectType):
@@ -199,6 +217,20 @@ class Query(graphene.ObjectType):
         limit=graphene.Int(required=False, default_value=3)
     )
 
+    # Rendelések
+    orders = graphene.List(
+        OrderType,
+        status=graphene.String(required=False),
+        limit=graphene.Int(required=False),
+        offset=graphene.Int(required=False),
+        description="Rendelések listája szűrőkkel és lapozással",
+    )
+
+    # Dashboard statisztikák
+    dashboard_stats = graphene.Field(
+        DashboardStatsType,
+        description="Dashboard statisztikák (termékek, rendelések, bevétel)",
+    )
 
     cart = graphene.Field(CartType)
     cart_summary = graphene.Field(CartSummaryType)
@@ -252,6 +284,33 @@ class Query(graphene.ObjectType):
             .filter(order_items__order__status=Order.Status.DELIVERED)
             .annotate(total_sold=Sum("order_items__quantity"))
             .order_by("-total_sold")[:limit]
+        )
+
+    def resolve_orders(self, info, status=None, limit=50, offset=0):
+        qs = Order.objects.all().prefetch_related("items__product")
+        if status:
+            qs = qs.filter(status=status)
+        qs = qs.order_by("-created_at")
+        return list(qs[offset : offset + (limit or 50)])
+
+    def resolve_dashboard_stats(self, info):
+        # Aktív termékek száma
+        active_products_count = Product.objects.filter(is_active=True).count()
+        
+        # Összes rendelés száma
+        total_orders_count = Order.objects.count()
+        
+        # Kiszállított rendelések bevétele
+        delivered_orders_revenue = Order.objects.filter(
+            status=Order.Status.DELIVERED
+        ).aggregate(
+            total=Sum('grand_total')
+        )['total'] or 0
+        
+        return DashboardStatsType(
+            active_products_count=active_products_count,
+            total_orders_count=total_orders_count,
+            delivered_orders_revenue=delivered_orders_revenue
         )
 
 class CreateContactMessage(graphene.Mutation):
@@ -331,12 +390,181 @@ class RemoveItem(graphene.Mutation):
         CartItem.objects.filter(id=item_id, cart=cart).delete()
         return RemoveItem(cart=cart)
 
+class CreateProduct(graphene.Mutation):
+    class Arguments:
+        input = ProductInput(required=True)
+
+    id = graphene.Int()
+    product = graphene.Field(ProductType)
+
+    def mutate(self, info, input):
+        # Generate slug from name
+        slug = slugify(input.name)
+        counter = 1
+        original_slug = slug
+        while Product.objects.filter(slug=slug).exists():
+            slug = f"{original_slug}-{counter}"
+            counter += 1
+
+        product = Product.objects.create(
+            name=input.name,
+            slug=slug,
+            description=input.get('description', ''),
+            price=input.price,
+            category_id=input.get('categoryId'),
+            sku=input.sku,
+            stock_qty=input.stockQty,
+            is_active=input.get('isActive', True)
+        )
+        return CreateProduct(id=product.id, product=product)
+
+class UpdateProduct(graphene.Mutation):
+    class Arguments:
+        slug = graphene.String(required=True)
+        input = ProductInput(required=True)
+
+    id = graphene.Int()
+    product = graphene.Field(ProductType)
+
+    def mutate(self, info, slug, input):
+        try:
+            product = Product.objects.get(slug=slug)
+        except Product.DoesNotExist:
+            raise Exception("Termék nem található")
+
+        product.name = input.name
+        product.description = input.get('description', '')
+        product.price = input.price
+        product.category_id = input.get('categoryId')
+        product.sku = input.sku
+        product.stock_qty = input.stockQty
+        product.is_active = input.get('isActive', True)
+        product.save()
+
+        return UpdateProduct(id=product.id, product=product)
+
+class DeleteProduct(graphene.Mutation):
+    class Arguments:
+        slug = graphene.String(required=True)
+
+    success = graphene.Boolean()
+    deactivated = graphene.Boolean()
+
+    def mutate(self, info, slug):
+        try:
+            product = Product.objects.get(slug=slug)
+            
+            if product.is_active:
+                # Aktív termék -> inaktívvá tesszük
+                product.is_active = False
+                product.save()
+                return DeleteProduct(success=True, deactivated=True)
+            else:
+                # Inaktív termék -> töröljük
+                product.delete()
+                return DeleteProduct(success=True, deactivated=False)
+                
+        except Product.DoesNotExist:
+            raise Exception("Termék nem található")
+
+class UpdateOrderStatus(graphene.Mutation):
+    class Arguments:
+        order_id = graphene.Int(required=True)
+        status = graphene.String(required=True)
+
+    order = graphene.Field(OrderType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, order_id, status):
+        try:
+            order = Order.objects.get(id=order_id)
+            
+            # Validate status
+            valid_statuses = [choice[0] for choice in Order.Status.choices]
+            if status not in valid_statuses:
+                raise Exception(f"Érvénytelen státusz: {status}")
+            
+            order.status = status
+            order.save()
+            
+            return UpdateOrderStatus(order=order, success=True)
+        except Order.DoesNotExist:
+            raise Exception("Rendelés nem található")
+
+class OrderInput(graphene.InputObjectType):
+    customer_name = graphene.String(required=True)
+    customer_email = graphene.String()
+    customer_phone = graphene.String(required=True)
+    shipping_address = graphene.String(required=True)
+    shipping_city = graphene.String(required=True)
+    shipping_zip = graphene.String(required=True)
+    delivery_notes = graphene.String()
+    grand_total = graphene.Decimal(required=True)
+
+class CreateOrder(graphene.Mutation):
+    class Arguments:
+        input = OrderInput(required=True)
+
+    order = graphene.Field(OrderType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, input):
+        try:
+            # Get cart from session
+            cart = get_or_create_cart(info.context)
+            
+            if not cart.items.exists():
+                raise Exception("A kosár üres")
+            
+            # Calculate totals
+            subtotal = sum(item.line_total for item in cart.items.all())
+            
+            # Create order
+            order = Order.objects.create(
+                customer_name=input.customer_name,
+                customer_email=input.customer_email,
+                customer_phone=input.customer_phone,
+                shipping_address=input.shipping_address,
+                shipping_city=input.shipping_city,
+                shipping_zip=input.shipping_zip,
+                delivery_notes=input.delivery_notes or "",
+                subtotal=subtotal,
+                grand_total=subtotal,  # For now, no shipping or discounts
+                placed_ip=info.context.META.get('REMOTE_ADDR'),
+                placed_user_agent=info.context.META.get('HTTP_USER_AGENT', '')[:300]
+            )
+            
+            # Create order items from cart
+            for cart_item in cart.items.all():
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    name_snapshot=cart_item.product.name,
+                    unit_price_snapshot=cart_item.unit_price_snapshot,
+                    quantity=cart_item.quantity,
+                    line_total=cart_item.line_total
+                )
+            
+            # Clear cart
+            cart.items.all().delete()
+            
+            return CreateOrder(order=order, success=True)
+        except Exception as e:
+            raise Exception(str(e))
+
 class Mutation(graphene.ObjectType):
     create_contact_message = CreateContactMessage.Field()
 
     add_to_cart  = AddToCart.Field()
     set_quantity = SetQuantity.Field()
     remove_item  = RemoveItem.Field()
+
+    create_product = CreateProduct.Field()
+    update_product = UpdateProduct.Field()
+    delete_product = DeleteProduct.Field()
+    
+    update_order_status = UpdateOrderStatus.Field()
+    create_order = CreateOrder.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

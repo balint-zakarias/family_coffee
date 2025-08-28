@@ -1,17 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { NgIf, DecimalPipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
+import { Graphql } from '../../../../core/graphql.service';
+
+interface DashboardStats {
+  activeProductsCount: number;
+  totalOrdersCount: number;
+  deliveredOrdersRevenue: number;
+}
 
 @Component({
   selector: 'page-dashboard',
   standalone: true,
-  imports: [DashboardHeader, RouterLink],
+  imports: [DashboardHeader, RouterLink, NgIf, DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
 export class Dashboard implements OnInit {
+  stats = signal<DashboardStats | null>(null);
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private gql: Graphql) {}
 
   ngOnInit() {
     // Ellenőrizzük, hogy be van-e jelentkezve a felhasználó
@@ -28,9 +39,36 @@ export class Dashboard implements OnInit {
         this.router.navigate(['/']);
         return;
       }
+      
+      // Ha minden rendben, betöltjük a statisztikákat
+      this.loadStats();
     } catch (e) {
       console.error('Error parsing user data:', e);
       this.router.navigate(['/login']);
+    }
+  }
+
+  async loadStats() {
+    this.loading.set(true);
+    this.error.set(null);
+
+    const QUERY = /* GraphQL */ `
+      query DashboardStats {
+        dashboardStats {
+          activeProductsCount
+          totalOrdersCount
+          deliveredOrdersRevenue
+        }
+      }
+    `;
+
+    try {
+      const data = await this.gql.query<{ dashboardStats: DashboardStats }>(QUERY);
+      this.stats.set(data.dashboardStats);
+    } catch (e: any) {
+      this.error.set(e?.message || 'Hiba a statisztikák betöltése során');
+    } finally {
+      this.loading.set(false);
     }
   }
 }

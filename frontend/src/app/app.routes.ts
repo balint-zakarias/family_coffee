@@ -9,6 +9,7 @@ import { Login } from '@features/auth/pages/login/login';
 import { Dashboard } from '@features/dashboard/pages/dashboard/dashboard';
 import { Products } from '@features/dashboard/pages/products/products';
 import { ProductForm } from '@features/dashboard/pages/product-form/product-form';
+import { Orders } from '@features/dashboard/pages/orders/orders';
 
 export const routes: Routes = [
   { path: '', component: Home, title: 'FamilyCoffee – Kezdőlap' },
@@ -22,5 +23,6 @@ export const routes: Routes = [
   { path: 'dashboard/products/new', component: ProductForm, title: 'Új termék – FamilyCoffee Admin' },
   { path: 'dashboard/products/:slug/edit', component: ProductForm, title: 'Termék szerkesztése – FamilyCoffee Admin' },
   { path: 'dashboard/products/:slug/view', component: ProductForm, title: 'Termék megtekintése – FamilyCoffee Admin' },
+  { path: 'dashboard/orders', component: Orders, title: 'Rendelések – FamilyCoffee Admin' },
   { path: '**', redirectTo: '' },
 ];

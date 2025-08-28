@@ -71,31 +71,91 @@
   <section class="checkout" *ngIf="!loading() && items().length">
     <div class="wrap">
       <h3>Adatok</h3>
-      <form class="form" (submit)="$event.preventDefault()">
+      <form class="form" [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
         <div class="row">
-          <input type="text" placeholder="Név" class="input full" />
+          <input 
+            type="text" 
+            placeholder="Név *" 
+            class="input full" 
+            formControlName="customerName"
+            [class.error]="orderForm.get('customerName')?.invalid && orderForm.get('customerName')?.touched"
+          />
         </div>
         <div class="row">
-          <input type="tel" placeholder="Telefon" class="input" />
-          <input type="email" placeholder="E-mail" class="input" />
+          <input 
+            type="tel" 
+            placeholder="Telefon *" 
+            class="input" 
+            formControlName="customerPhone"
+            [class.error]="orderForm.get('customerPhone')?.invalid && orderForm.get('customerPhone')?.touched"
+          />
+          <input 
+            type="email" 
+            placeholder="E-mail" 
+            class="input" 
+            formControlName="customerEmail"
+            [class.error]="orderForm.get('customerEmail')?.invalid && orderForm.get('customerEmail')?.touched"
+          />
         </div>
         <div class="row">
-          <input type="text" placeholder="Irányítószám" class="input" />
-          <input type="text" placeholder="Település" class="input" />
+          <input 
+            type="text" 
+            placeholder="Irányítószám *" 
+            class="input" 
+            formControlName="shippingZip"
+            [class.error]="orderForm.get('shippingZip')?.invalid && orderForm.get('shippingZip')?.touched"
+          />
+          <input 
+            type="text" 
+            placeholder="Település *" 
+            class="input" 
+            formControlName="shippingCity"
+            [class.error]="orderForm.get('shippingCity')?.invalid && orderForm.get('shippingCity')?.touched"
+          />
         </div>
         <div class="row">
-          <input type="text" placeholder="Közterület neve" class="input" />
-          <input type="text" placeholder="Házszám" class="input" />
+          <input 
+            type="text" 
+            placeholder="Utca, házszám *" 
+            class="input" 
+            formControlName="shippingAddress"
+            [class.error]="orderForm.get('shippingAddress')?.invalid && orderForm.get('shippingAddress')?.touched"
+          />
         </div>
         <div class="row">
-          <textarea placeholder="Megjegyzés" class="textarea"></textarea>
+          <textarea 
+            placeholder="Megjegyzés" 
+            class="textarea"
+            formControlName="deliveryNotes"
+          ></textarea>
         </div>
+
+        <!-- Success message -->
+        <div *ngIf="orderSuccess()" class="success-message">
+          ✅ Rendelés sikeresen leadva! Hamarosan felvesszük Önnel a kapcsolatot.
+        </div>
+
+        <!-- Error message -->
+        <div *ngIf="orderError()" class="error-message">
+          ⚠️ {{ orderError() }}
+        </div>
+
         <label class="policy">
-          <input type="checkbox" />
-          Elfogadom az <a href="/privacy" target="_blank">Adatvédelmi Nyilatkozatot</a>
+          <input 
+            type="checkbox" 
+            formControlName="acceptedPolicy"
+          />
+          Elfogadom az <a href="/privacy" target="_blank">Adatvédelmi Nyilatkozatot</a> *
         </label>
         <div class="submit-wrap">
-          <button type="submit" class="submit">Rendelés leadása</button>
+          <button 
+            type="submit" 
+            class="submit"
+            [disabled]="!canSubmitOrder"
+          >
+            <span *ngIf="orderLoading()" class="loading-spinner"></span>
+            {{ orderLoading() ? 'Rendelés leadása...' : 'Rendelés leadása' }}
+          </button>
         </div>
       </form>
     </div>

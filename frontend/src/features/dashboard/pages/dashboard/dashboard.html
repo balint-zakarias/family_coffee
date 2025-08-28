@@ -16,7 +16,8 @@
           <div class="stat-icon">📦</div>
           <div class="stat-content">
             <h3>Termékek</h3>
-            <p class="stat-number">--</p>
+            <p class="stat-number" *ngIf="!loading() && stats()">{{ stats()?.activeProductsCount }}</p>
+            <p class="stat-number" *ngIf="loading()">--</p>
             <p class="stat-label">Aktív termék</p>
           </div>
         </div>
@@ -25,21 +26,29 @@
           <div class="stat-icon">🛒</div>
           <div class="stat-content">
             <h3>Rendelések</h3>
-            <p class="stat-number">--</p>
+            <p class="stat-number" *ngIf="!loading() && stats()">{{ stats()?.totalOrdersCount }}</p>
+            <p class="stat-number" *ngIf="loading()">--</p>
             <p class="stat-label">Összes rendelés</p>
           </div>
         </div>
-
-        
 
         <div class="stat-card">
           <div class="stat-icon">💰</div>
           <div class="stat-content">
             <h3>Bevétel</h3>
-            <p class="stat-number">-- Ft</p>
-            <p class="stat-label">Összes bevétel</p>
+            <p class="stat-number" *ngIf="!loading() && stats()">{{ stats()?.deliveredOrdersRevenue | number:'1.0-0' }} Ft</p>
+            <p class="stat-number" *ngIf="loading()">-- Ft</p>
+            <p class="stat-label">Kiszállított rendelések</p>
           </div>
         </div>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="error()" class="error-message">
+        <p>⚠️ {{ error() }}</p>
+        <button type="button" class="btn btn-primary" (click)="loadStats()">
+          Újrapróbálás
+        </button>
       </div>
     </section>
 
@@ -55,13 +64,13 @@
           </div>
         </a>
 
-        <button class="action-card" type="button">
+        <a routerLink="/dashboard/orders" class="action-card">
           <div class="action-icon">🛒</div>
           <div class="action-content">
             <h3>Rendelések</h3>
             <p>Rendelések megtekintése és kezelése</p>
           </div>
-        </button>
+        </a>
 
         <button class="action-card" type="button">
           <div class="action-icon">🎨</div>

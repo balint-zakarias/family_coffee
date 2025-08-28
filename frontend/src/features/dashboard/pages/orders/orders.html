@@ -1,0 +1,128 @@
+<!-- Page Header -->
+<app-dashboard-header 
+  title="Rendelések" 
+  subtitle="Beérkezett rendelések kezelése és nyomon követése"
+></app-dashboard-header>
+
+<main class="orders-main">
+  <div class="orders-container">
+
+    <!-- Filters -->
+    <section class="filters-section">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="filter-label">Státusz szűrés</label>
+          <select class="filter-select" (change)="onStatusFilterChange($event)">
+            <option value="">Összes rendelés</option>
+            <option value="placed">Leadva</option>
+            <option value="delivered">Kiszállítva</option>
+            <option value="canceled">Törölve</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Rendelések betöltése...</p>
+    </section>
+
+    <!-- Error -->
+    <section *ngIf="error()" class="error-section">
+      <div class="error-icon">⚠️</div>
+      <h3>Hiba történt</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadOrders()">
+        Újrapróbálás
+      </button>
+    </section>
+
+    <!-- Orders Table -->
+    <section *ngIf="!loading() && !error()" class="table-section">
+      <div class="table-container">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Rendelés #</th>
+              <th>Vevő</th>
+              <th>Elérhetőség</th>
+              <th>Cím</th>
+              <th>Tételek</th>
+              <th>Összeg</th>
+              <th>Státusz</th>
+              <th>Dátum</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders()" class="order-row">
+              <!-- Order ID -->
+              <td class="order-id">
+                <strong>#{{ order.id }}</strong>
+              </td>
+
+              <!-- Customer -->
+              <td class="customer-info">
+                <div class="customer-name">{{ order.customerName }}</div>
+              </td>
+
+              <!-- Contact -->
+              <td class="contact-info">
+                <div class="email" *ngIf="order.customerEmail">{{ order.customerEmail }}</div>
+                <div class="phone">{{ order.customerPhone }}</div>
+              </td>
+
+              <!-- Address -->
+              <td class="address-info">
+                <div class="address">{{ order.shippingAddress }}</div>
+                <div class="city">{{ order.shippingCity }}</div>
+              </td>
+
+              <!-- Items -->
+              <td class="items-info">
+                <div class="items-count">{{ getTotalItems(order) }} tétel</div>
+                <div class="items-detail">
+                  <div *ngFor="let item of order.items" class="item-line">
+                    {{ item.nameSnapshot }} ({{ item.quantity }}x)
+                  </div>
+                </div>
+              </td>
+
+              <!-- Total -->
+              <td class="total-cell">
+                <strong>{{ order.grandTotal | number:'1.0-0' }} Ft</strong>
+              </td>
+
+              <!-- Status -->
+              <td class="status-cell">
+                <select 
+                  class="status-select"
+                  [value]="order.status.toLowerCase()"
+                  (change)="updateOrderStatus(order.id, $any($event.target).value)"
+                  [ngClass]="getStatusClass(order.status)"
+                >
+                  <option value="placed">Leadva</option>
+                  <option value="delivered">Kiszállítva</option>
+                  <option value="canceled">Törölve</option>
+                </select>
+              </td>
+
+              <!-- Date -->
+              <td class="date-cell">
+                {{ order.createdAt | date:'yyyy.MM.dd HH:mm' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div *ngIf="orders().length === 0" class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h3>Nincsenek rendelések</h3>
+          <p>Még nem érkezett be rendelés a kiválasztott szűrőkkel.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
