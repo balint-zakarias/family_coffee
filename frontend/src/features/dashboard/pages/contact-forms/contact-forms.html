@@ -1,0 +1,87 @@
+<!-- Page Header -->
+<app-dashboard-header 
+  title="Kapcsolat üzenetek" 
+  subtitle="Beérkezett kapcsolat üzenetek megtekintése és kezelése"
+></app-dashboard-header>
+
+<main class="contact-forms-main">
+  <div class="contact-forms-container">
+
+    <!-- Loading -->
+    <section *ngIf="loading()" class="loading-section">
+      <div class="loading-spinner"></div>
+      <p>Üzenetek betöltése...</p>
+    </section>
+
+    <!-- Error -->
+    <section *ngIf="error()" class="error-section">
+      <div class="error-icon">⚠️</div>
+      <h3>Hiba történt</h3>
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn-primary" (click)="loadContactMessages()">
+        Újrapróbálás
+      </button>
+    </section>
+
+    <!-- Contact Messages Table -->
+    <section *ngIf="!loading() && !error()" class="table-section">
+      <div class="table-container">
+        <table class="contact-messages-table">
+          <thead>
+            <tr>
+              <th>Név</th>
+              <th>Elérhetőség</th>
+              <th>Üzenet</th>
+              <th>Dátum</th>
+              <th>Műveletek</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let message of contactMessages()" class="message-row">
+              <!-- Name -->
+              <td class="name-cell">
+                <strong>{{ message.name }}</strong>
+              </td>
+
+              <!-- Contact Info -->
+              <td class="contact-cell">
+                <div class="contact-info">{{ getContactInfo(message) }}</div>
+              </td>
+
+              <!-- Message -->
+              <td class="message-cell">
+                <div class="message-content">{{ message.message }}</div>
+              </td>
+
+              <!-- Date -->
+              <td class="date-cell">
+                {{ message.createdAt | date:'yyyy.MM.dd HH:mm' }}
+              </td>
+
+              <!-- Actions -->
+              <td class="actions-cell">
+                <button 
+                  type="button" 
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteContactMessage(message.id)"
+                  title="Üzenet törlése"
+                >
+                <mat-icon>delete</mat-icon>
+                Törlés
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty state -->
+        <div *ngIf="contactMessages().length === 0" class="empty-state">
+          <div class="empty-icon">📧</div>
+          <h3>Nincsenek üzenetek</h3>
+          <p>Még nem érkezett be kapcsolat üzenet.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>

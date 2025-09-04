@@ -13,6 +13,7 @@ import { Orders } from '@features/dashboard/pages/orders/orders';
 import { Settings } from '@features/dashboard/pages/settings/settings';
 import { Content } from '@features/dashboard/pages/content/content';
 import { Categories } from '@features/dashboard/pages/categories/categories';
+import { ContactForms } from '@features/dashboard/pages/contact-forms/contact-forms';
 
 export const routes: Routes = [
   { path: '', component: Home, title: 'FamilyCoffee – Kezdőlap' },
@@ -30,5 +31,6 @@ export const routes: Routes = [
   { path: 'dashboard/settings', component: Settings, title: 'Beállítások – FamilyCoffee Admin' },
   { path: 'dashboard/content', component: Content, title: 'Tartalom – FamilyCoffee Admin' },
   { path: 'dashboard/categories', component: Categories, title: 'Kategóriák – FamilyCoffee Admin' },
+  { path: 'dashboard/contact-forms', component: ContactForms, title: 'Kapcsolat üzenetek – FamilyCoffee Admin' },
   { path: '**', redirectTo: '' },
 ];

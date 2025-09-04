@@ -238,6 +238,14 @@ class Query(graphene.ObjectType):
         description="Dashboard statisztikák (termékek, rendelések, bevétel)",
     )
 
+    # Kapcsolat üzenetek
+    contact_messages = graphene.List(
+        ContactMessageType,
+        limit=graphene.Int(required=False),
+        offset=graphene.Int(required=False),
+        description="Kapcsolat üzenetek listája lapozással",
+    )
+
     cart = graphene.Field(CartType)
     cart_summary = graphene.Field(CartSummaryType)
 
@@ -322,6 +330,11 @@ class Query(graphene.ObjectType):
             delivered_orders_revenue=delivered_orders_revenue
         )
 
+    def resolve_contact_messages(self, info, limit=None, offset=None):
+        qs = ContactMessage.objects.all()
+        offset = offset or 0
+        return list(qs[offset : offset + (limit or 50)])
+
 class CreateContactMessage(graphene.Mutation):
     class Arguments:
         name = graphene.String(required=True)
@@ -342,6 +355,21 @@ class CreateContactMessage(graphene.Mutation):
             message=message
         )
         return CreateContactMessage(contact_message=contact_message)
+
+class DeleteContactMessage(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        try:
+            contact_message = ContactMessage.objects.get(id=id)
+            contact_message.delete()
+            return DeleteContactMessage(success=True)
+        except ContactMessage.DoesNotExist:
+            raise Exception("Kapcsolat üzenet nem található.")
+
 class AddToCart(graphene.Mutation):
     class Arguments:
         product_id = graphene.ID(required=True)
@@ -683,6 +711,7 @@ class DeleteCategory(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_contact_message = CreateContactMessage.Field()
+    delete_contact_message = DeleteContactMessage.Field()
 
     add_to_cart  = AddToCart.Field()
     set_quantity = SetQuantity.Field()
