@@ -10,12 +10,12 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer_name", "status", "grand_total", "created_at")
+    list_display = ("id", "order_id", "customer_name", "status", "grand_total", "created_at")
     list_filter = ("status", "created_at")
-    search_fields = ("customer_name", "customer_email", "customer_phone")
+    search_fields = ("order_id", "customer_name", "customer_email", "customer_phone")
     date_hierarchy = "created_at"
     inlines = [OrderItemInline]
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("order_id", "created_at", "updated_at")
 
 
 @admin.register(OrderItem)

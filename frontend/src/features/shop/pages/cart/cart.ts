@@ -217,11 +217,14 @@ export class Cart {
       await this.gql.mutate(MUTATION, { input: orderInput });
 
       this.orderSuccess.set(true);
-      setTimeout(() => this.orderSuccess.set(false), 3000);
+      setTimeout(() => this.orderSuccess.set(false), 4000);
       
       // Clear cart and form
       this.items.set([]);
       this.orderForm.reset({ acceptedPolicy: false });
+      
+      // Update cart service to refresh header icon
+      await this.cartService.refreshCount();
       
     } catch (e: any) {
       this.orderError.set(e?.message || 'Hiba történt a rendelés leadása során');

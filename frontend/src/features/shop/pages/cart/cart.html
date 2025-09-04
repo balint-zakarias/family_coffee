@@ -4,8 +4,13 @@
   <section *ngIf="error()" class="status error">Hiba: {{ error() }}</section>
 
   <!-- üres állapot -->
-  <section class="empty" *ngIf="!loading() && !items().length" style="height:100vh; display:flex; align-items:center; justify-content:center;">
-    A kosarad üres.
+  <section class="empty-cart" *ngIf="!loading() && !items().length">
+    <div class="empty-content">
+      <div class="empty-icon">🛒</div>
+      <h2>A kosarad üres</h2>
+      <p>Még nem adtál hozzá terméket a kosaradhoz.</p>
+      <a href="/shop" class="shop-btn">Böngészés a webshopban</a>
+    </div>
   </section>
 
   <!-- sorok csak akkor, ha van tétel -->
@@ -130,9 +135,12 @@
           ></textarea>
         </div>
 
-        <!-- Success message -->
-        <div *ngIf="orderSuccess()" class="success-message">
-          ✅ Rendelés sikeresen leadva! Hamarosan felvesszük Önnel a kapcsolatot.
+        <!-- Success animation -->
+        <div *ngIf="orderSuccess()" class="success-animation">
+          <div class="checkmark-circle">
+            <div class="checkmark"></div>
+          </div>
+          <p>Rendelés sikeresen leadva!</p>
         </div>
 
         <!-- Error message -->

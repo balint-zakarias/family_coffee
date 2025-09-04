@@ -91,11 +91,35 @@ export class List implements OnInit {
     });
   }
 
-  // keresés gomb/enter
-  doSearch() {
+  onSearchChange(searchTerm: string) {
+    this.search.set(searchTerm);
+    // Debounce search - wait 500ms after user stops typing
+    setTimeout(() => {
+      if (this.search() === searchTerm) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { q: searchTerm || null, category: this.selectedCategory() || null },
+          queryParamsHandling: 'merge'
+        });
+      }
+    }, 500);
+  }
+
+  clearSearch() {
+    this.search.set('');
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { q: this.search() || null, category: this.selectedCategory() || null },
+      queryParams: { q: null, category: this.selectedCategory() || null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  clearFilters() {
+    this.search.set('');
+    this.selectedCategory.set(null);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { q: null, category: null },
       queryParamsHandling: 'merge'
     });
   }

@@ -177,6 +177,11 @@ export class Products implements OnInit {
     }, 500);
   }
 
+  clearSearch() {
+    this.searchTerm.set('');
+    this.loadProducts();
+  }
+
   onShowInactiveChange(showInactive: boolean) {
     this.showInactiveProducts.set(showInactive);
     this.loadProducts();

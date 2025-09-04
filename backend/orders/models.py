@@ -1,5 +1,6 @@
-from django.db import models
+from django.db import models, IntegrityError
 from catalog.models import Product
+from orders.utils import generate_order_id
 
 
 class Order(models.Model):
@@ -7,6 +8,8 @@ class Order(models.Model):
         PLACED = "placed", "Leadva"
         DELIVERED = "delivered", "Kiszállítva"
         CANCELED = "canceled", "Törölve"
+
+    order_id = models.CharField(max_length=20, unique=True, editable=False)
 
     # Vevő- és szállítási adatok
     customer_name = models.CharField(max_length=160)
@@ -35,6 +38,17 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.order_id:
+            for _ in range(5):
+                self.order_id = generate_order_id()
+                try:
+                    return super().save(*args, **kwargs)
+                except IntegrityError:
+                    self.order_id = None
+            raise
+        return super().save(*args, **kwargs)        
 
     class Meta:
         ordering = ["-created_at"]

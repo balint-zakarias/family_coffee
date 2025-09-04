@@ -1,12 +1,20 @@
 <section class="search">
-  <input
-    type="text"
-    placeholder="Keresés…"
-    [value]="search()"
-    (input)="search.set(($any($event.target)).value)"
-    (keyup.enter)="doSearch()"
-  >
-  <button (click)="doSearch()">Keresés</button>
+  <div class="search-input-container">
+    <input
+      type="text"
+      placeholder="Keresés…"
+      [value]="search()"
+      (input)="onSearchChange(($any($event.target)).value)"
+    >
+    <button 
+      *ngIf="search()" 
+      class="clear-btn" 
+      (click)="clearSearch()"
+      type="button"
+    >
+      ×
+    </button>
+  </div>
 </section>
 
 <!-- Kategória chipek -->
@@ -29,13 +37,31 @@
   </button>
 </div>
 
-<section *ngIf="loading()">Betöltés…</section>
-<section *ngIf="error()" class="error">Hiba: {{ error() }}</section>
+<div class="products-container">
+  <section *ngIf="loading()" class="loading">
+    <div class="spinner"></div>
+    <p>Betöltés…</p>
+  </section>
 
-<section class="grid" *ngIf="!loading() && !error()">
-  <ui-product-card *ngFor="let p of products()" 
-  [product]="p"
-  (addToCart)="onAddToCart($event)"
-  (viewDetails)="onViewDetails($event)"
-  ></ui-product-card>
-</section>
+  <section *ngIf="error()" class="error">Hiba: {{ error() }}</section>
+
+  <section class="grid" *ngIf="!loading() && !error() && products().length > 0">
+    <ui-product-card *ngFor="let p of products()" 
+    [product]="p"
+    (addToCart)="onAddToCart($event)"
+    (viewDetails)="onViewDetails($event)"
+    ></ui-product-card>
+  </section>
+
+  <section class="empty-products" *ngIf="!loading() && !error() && products().length === 0">
+    <div class="empty-content">
+      <div class="empty-icon">📦</div>
+      <h2>Nincs találat</h2>
+      <p *ngIf="search() || selectedCategory()">A keresési feltételeknek megfelelő termék nem található.</p>
+      <p *ngIf="!search() && !selectedCategory()">Jelenleg nincsenek elérhető termékek.</p>
+      <button class="clear-filters-btn" *ngIf="search() || selectedCategory()" (click)="clearFilters()">
+        Szűrők törlése
+      </button>
+    </div>
+  </section>
+</div>

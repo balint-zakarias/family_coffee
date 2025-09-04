@@ -4,7 +4,7 @@
       <div
         class="product-card"
         *ngFor="let product of products"
-        [routerLink]="['/product', product.slug]"
+        [routerLink]="['/shop/product', product.slug]"
       >
         <div class="image-wrapper">
           <img [src]="product.imageUrl || '/assets/no-image.png'" [alt]="product.name" />

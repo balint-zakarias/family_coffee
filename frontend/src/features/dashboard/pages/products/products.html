@@ -23,14 +23,24 @@
         <!-- Search -->
         <div class="filter-group">
           <label for="search" class="filter-label">Keresés</label>
-          <input
-            type="text"
-            id="search"
-            class="filter-input"
-            placeholder="Termék neve, leírás vagy cikkszám..."
-            [value]="searchTerm()"
-            (input)="onSearchChange($any($event.target).value)"
-          />
+          <div class="search-input-container">
+            <input
+              type="text"
+              id="search"
+              class="filter-input"
+              placeholder="Termék neve, leírás vagy cikkszám..."
+              [value]="searchTerm()"
+              (input)="onSearchChange($any($event.target).value)"
+            />
+            <button 
+              *ngIf="searchTerm()" 
+              class="clear-btn" 
+              (click)="clearSearch()"
+              type="button"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         <!-- Category filter -->
