@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendelés visszaigazolás</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2a2a2a;
+            background-color: #f5f2ec;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #296100 0%, #204108 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .order-info {
+            background: #f8f6f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .order-info h2 {
+            margin: 0 0 15px 0;
+            color: #296100;
+            font-size: 18px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+        .products {
+            margin: 25px 0;
+        }
+        .products h3 {
+            color: #296100;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: 500;
+        }
+        .product-details {
+            color: #666;
+            font-size: 14px;
+        }
+        .product-price {
+            font-weight: 600;
+            color: #296100;
+        }
+        .total {
+            background: #296100;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .footer {
+            background: #f8f6f0;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Family Coffee</h1>
+            <p>Köszönjük rendelését!</p>
+        </div>
+        
+        <div class="content">
+            <div class="order-info">
+                <h2>Rendelés részletei</h2>
+                <div class="info-row">
+                    <span class="info-label">Rendelés azonosító:</span>
+                    <span><strong>{{ order.order_id }}</strong></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Dátum:</span>
+                    <span>{{ order.created_at|date:"Y. m. d. H:i" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Név:</span>
+                    <span>{{ order.customer_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span>{{ order.customer_email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Telefon:</span>
+                    <span>{{ order.customer_phone }}</span>
+                </div>
+            </div>
+
+            <div class="order-info">
+                <h2>Szállítási cím</h2>
+                <p>
+                    {{ order.shipping_address }}<br>
+                    {{ order.shipping_city }}, {{ order.shipping_zip }}
+                </p>
+                {% if order.delivery_notes %}
+                <p><strong>Megjegyzés:</strong> {{ order.delivery_notes }}</p>
+                {% endif %}
+            </div>
+
+            <div class="products">
+                <h3>Rendelt termékek</h3>
+                {% for item in order.items.all %}
+                <div class="product-item">
+                    <div>
+                        <div class="product-name">{{ item.name_snapshot }}</div>
+                        <div class="product-details">{{ item.quantity }} db × {{ item.unit_price_snapshot }} Ft</div>
+                    </div>
+                    <div class="product-price">{{ item.line_total }} Ft</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="total">
+                <p class="total-amount">Összesen: {{ order.grand_total }} Ft</p>
+            </div>
+
+            <div class="contact-info">
+                <p><strong>Kérdése van?</strong></p>
+                <p>Keressen minket bizalommal az alábbi elérhetőségeken:</p>
+                <p>📧 IDE BE KELL MAJD ÌRNI AZ EMAILT<br>📞 TELEFONSZAM</p>
+                <p>Hamarosan felvesszük Önnel a kapcsolatot a rendelés részleteivel kapcsolatban.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Family Coffee. Minden jog fenntartva.</p>
+            <p>Ez egy automatikus email, kérjük ne válaszoljon rá.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -4,6 +4,7 @@ from django.db.models import Q,  Sum
 from django.conf import settings
 from django.utils.text import slugify
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 from catalog.models import Category, Product, ProductImage
 from orders.models import Order, OrderItem
@@ -586,14 +587,20 @@ class CreateOrder(graphene.Mutation):
             # Clear cart
             cart.items.all().delete()
 
+            # Send confirmation email with HTML template
+            html_message = render_to_string('orders/order_confirmation_email.html', {
+                'order': order,
+            })
+            
             send_mail(
                 subject=f"Rendelés visszaigazolás #{order.order_id}",
                 message=f"Kedves {order.customer_name},\n\n"
                         f"Köszönjük rendelését! A rendelés azonosítója: {order.order_id}\n"
                         f"Összeg: {order.grand_total} Ft\n\n"
                         "Hamarosan felvesszük Önnel a kapcsolatot.",
-                from_email=None,  # DEFAULT_FROM_EMAIL-t használja
+                from_email=None,
                 recipient_list=[order.customer_email],
+                html_message=html_message,
                 fail_silently=False,
             )
             
