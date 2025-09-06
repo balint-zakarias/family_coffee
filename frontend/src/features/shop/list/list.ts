@@ -1,8 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
-import { NgIf, NgFor, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Graphql } from '../../../../core/graphql.service';
-import { ProductCard, UiProduct } from '../../../../shared/ui/product-card/product-card';
+import { Graphql } from '../../../core/graphql.service';
+import { ProductCard, UiProduct } from '../../../shared/ui/product-card/product-card';
 import { CartService } from 'core/cart.service';
 
 
@@ -11,18 +10,19 @@ type Category = { id: string; name: string; slug: string };
 @Component({
   selector: 'page-list',
   standalone: true,
-  imports: [NgIf, NgFor, DecimalPipe, ProductCard],
+  imports: [ProductCard],
   templateUrl: './list.html',
   styleUrls: ['./list.scss']
 })
 export class List implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
+  addingToCart = signal(false); // Globális kosárba helyezés állapot
 
   products = signal<UiProduct[]>([]);
   categories = signal<Category[]>([]);
-  selectedCategory = signal<string | null>(null); // <-- SLUG vagy null
-  search = signal<string>('');                    // keresőkifejezés
+  selectedCategory = signal<string | null>(null);
+  search = signal<string>('');
 
   constructor(
     private gql: Graphql,
@@ -124,13 +124,25 @@ export class List implements OnInit {
     });
   }
 
-  onAddToCart(p: UiProduct) {
-    if (!p?.id) return;
-    this.cartService.add(String(p.id), 1).catch(err => console.error(err));
+  async onAddToCart(p: UiProduct) {
+    if (!p?.id || this.addingToCart()) return;
+    
+    this.addingToCart.set(true);
+    try {
+      await this.cartService.add(String(p.id), 1);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      // 2 másodperc után engedjük újra a gombokat
+      setTimeout(() => {
+        this.addingToCart.set(false);
+      }, 2000);
+    }
   }
   
   onViewDetails(p: UiProduct) {
-    if (!p?.slug){
+    if (!p?.slug || this.addingToCart()){
+      if (this.addingToCart()) return; // Ne navigáljon animáció alatt
       console.error('Nincs slug a termékhez!');
       return;
     }

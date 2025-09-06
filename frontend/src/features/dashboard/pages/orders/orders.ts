@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { NgIf, NgFor, NgClass, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { NgClass, DatePipe, DecimalPipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
 import { Graphql } from '../../../../core/graphql.service';
 
@@ -27,7 +27,7 @@ interface Order {
 @Component({
   selector: 'page-orders',
   standalone: true,
-  imports: [DashboardHeader, NgIf, NgFor, NgClass, CurrencyPipe, DatePipe, DecimalPipe],
+  imports: [DashboardHeader, NgClass, DatePipe, DecimalPipe],
   templateUrl: './orders.html',
   styleUrls: ['./orders.scss'],
 })

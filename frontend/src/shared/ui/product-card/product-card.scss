@@ -74,28 +74,106 @@
     display: flex;
     gap: 10px;
 
-    .details,
-    .cart {
+    .details {
       padding: 8px 14px;
       border-radius: 10px;
       font: 600 14px/1 'Lexend', system-ui, sans-serif;
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .08s ease;
-      &:active { transform: translateY(1px); }
-    }
-
-    .details {
+      transition: background .15s ease, border-color .15s ease, color .15s ease, transform .08s ease, opacity .15s ease;
       border: 2px solid #2e2219;
       background: transparent;
       color: #2e2219;
-      &:hover { border-color: #8a6446; color: #8a6446; }
+      
+      &:hover:not(:disabled) { 
+        border-color: #8a6446; 
+        color: #8a6446; 
+      }
+      
+      &:active:not(:disabled) { 
+        transform: translateY(1px); 
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        border-color: #ccc;
+        color: #999;
+      }
     }
 
-    .cart {
-      border: 2px solid #2e2219;
-      background: #2e2219;
-      color: #f1d5a0;
-      &:hover { border-color: #8a6446; background: #8a6446; color: #f5eadf; }
+    .cart-wrapper {
+      position: relative;
+      flex: 1;
+      height: 36px;
+      
+      .cart,
+      .success-message {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 36px;
+        border-radius: 10px;
+        font: 600 14px/1 'Lexend', system-ui, sans-serif;
+        transition: opacity .3s ease, transform .3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .cart {
+        border: 2px solid #2e2219;
+        background: #2e2219;
+        color: #f1d5a0;
+        cursor: pointer;
+        opacity: 1;
+        transform: scale(1);
+
+        &:hover:not(:disabled) { 
+          border-color: #8a6446; 
+          background: #8a6446; 
+          color: #f5eadf; 
+        }
+
+        &:active:not(:disabled) { 
+          transform: translateY(1px); 
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+      }
+
+      .success-message {
+        background: #28a745;
+        color: white;
+        border: 2px solid #28a745;
+        gap: 6px;
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.95);
+
+        .checkmark {
+          font-size: 16px;
+          font-weight: bold;
+          padding-left: 4px;
+        }
+      }
+
+      &.show-success {
+        .cart {
+          opacity: 0;
+          transform: scale(0.95);
+          pointer-events: none;
+        }
+
+        .success-message {
+          opacity: 1;
+          pointer-events: auto;
+          transform: scale(1);
+        }
+      }
     }
   }
 }

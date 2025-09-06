@@ -15,11 +15,15 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=160)
     customer_email = models.EmailField(blank=True, null=True)
     customer_phone = models.CharField(max_length=50)
+    billing_address = models.CharField(max_length=300, blank=True, null=True)
+    billing_city = models.CharField(max_length=120, blank=True, null=True)
+    billing_zip = models.CharField(max_length=20, blank=True, null=True)
     shipping_address = models.CharField(max_length=300)
     shipping_city = models.CharField(max_length=120)
     shipping_zip = models.CharField(max_length=20)
     delivery_notes = models.CharField(max_length=300, blank=True, default="")
     preferred_delivery_time = models.CharField(max_length=120, blank=True, default="")
+    different_delivery_address = models.BooleanField(default=False)
 
     # Státusz
     status = models.CharField(

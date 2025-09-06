@@ -1,27 +1,26 @@
 <div class="cart-page">
   <!-- státuszok -->
-  <section *ngIf="loading()" class="status">Betöltés…</section>
-  <section *ngIf="error()" class="status error">Hiba: {{ error() }}</section>
+  @if(loading()){<section class="status">Betöltés…</section>}
+  @if(error()){<section class="status error">Hiba: {{ error() }}</section>}
 
   <!-- üres állapot -->
-  <section class="empty-cart" *ngIf="!loading() && !items().length">
+  @if(!loading() && !items().length){<section class="empty-cart">
     <div class="empty-content">
       <div class="empty-icon">🛒</div>
       <h2>A kosarad üres</h2>
       <p>Még nem adtál hozzá terméket a kosaradhoz.</p>
       <a href="/shop" class="shop-btn">Böngészés a webshopban</a>
     </div>
-  </section>
+  </section>}
 
   <!-- sorok csak akkor, ha van tétel -->
-  <section class="wrap head" *ngIf="!loading() && items().length">
+  @if(!loading() && items().length){<section class="wrap head">
     <h1>Rendelés</h1>
     <h2>Kosár tartalma</h2>
 
     <div class="lines">
-      <div
+      @for(it of items(); track trackById($index, it)){<div
         class="line"
-        *ngFor="let it of items(); trackBy: trackById"
         [class.busy]="isPending(it.id)"
         [attr.aria-busy]="isPending(it.id) ? 'true' : 'false'"
       >
@@ -29,7 +28,7 @@
           <img [src]="it.imageUrl" [alt]="it.name" />
           <div class="meta">
             <div class="title">{{ it.name }}</div>
-            <div class="sub" *ngIf="it.subtitle">{{ it.subtitle }}</div>
+            @if(it.subtitle){<div class="sub">{{ it.subtitle }}</div>}
           </div>
         </div>
 
@@ -63,17 +62,17 @@
           [disabled]="isPending(it.id)"
           [attr.aria-label]="'Tétel törlése: ' + it.name"
         >🗑️</button>
-      </div>
+      </div>}
     </div>
 
     <div class="total">
       <div class="label">Végösszeg:</div>
       <div class="value">{{ total() | number:'1.0-0' }} Ft</div>
     </div>
-  </section>
+  </section>}
 
   <!-- Adatok / űrlap blokk (marad vizuális) -->
-  <section class="checkout" *ngIf="!loading() && items().length">
+  @if(!loading() && items().length){<section class="checkout">
     <div class="wrap">
       <h3>Adatok</h3>
       <form class="form" [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
@@ -96,26 +95,27 @@
           />
           <input 
             type="email" 
-            placeholder="E-mail" 
+            placeholder="E-mail *" 
             class="input" 
             formControlName="customerEmail"
             [class.error]="orderForm.get('customerEmail')?.invalid && orderForm.get('customerEmail')?.touched"
           />
         </div>
+        <h4>Számlázási cím</h4>
         <div class="row">
           <input 
             type="text" 
             placeholder="Irányítószám *" 
             class="input" 
-            formControlName="shippingZip"
-            [class.error]="orderForm.get('shippingZip')?.invalid && orderForm.get('shippingZip')?.touched"
+            formControlName="billingZip"
+            [class.error]="orderForm.get('billingZip')?.invalid && orderForm.get('billingZip')?.touched"
           />
           <input 
             type="text" 
             placeholder="Település *" 
             class="input" 
-            formControlName="shippingCity"
-            [class.error]="orderForm.get('shippingCity')?.invalid && orderForm.get('shippingCity')?.touched"
+            formControlName="billingCity"
+            [class.error]="orderForm.get('billingCity')?.invalid && orderForm.get('billingCity')?.touched"
           />
         </div>
         <div class="row">
@@ -123,10 +123,45 @@
             type="text" 
             placeholder="Utca, házszám *" 
             class="input" 
-            formControlName="shippingAddress"
-            [class.error]="orderForm.get('shippingAddress')?.invalid && orderForm.get('shippingAddress')?.touched"
+            formControlName="billingAddress"
+            [class.error]="orderForm.get('billingAddress')?.invalid && orderForm.get('billingAddress')?.touched"
           />
         </div>
+
+        <label class="shipToDifferent">
+          <input
+            type="checkbox"
+            formControlName="differentDeliveryAddress"
+          />
+          Szállítás másik címre
+        </label>
+        @if(orderForm.get('differentDeliveryAddress')?.value){<h4>Szállítási cím</h4>}
+        @if(orderForm.get('differentDeliveryAddress')?.value){<div class="row">
+          <input 
+            type="text" 
+            placeholder="Irányítószám *" 
+            class="input" 
+            formControlName="shippingZip"
+            [class.error]="orderForm.get('differentDeliveryAddress') &&  (orderForm.get('shippingZip')?.invalid && orderForm.get('shippingZip')?.touched)"
+          />
+          <input 
+            type="text" 
+            placeholder="Település *" 
+            class="input" 
+            formControlName="shippingCity"
+            [class.error]="orderForm.get('differentDeliveryAddress') &&  (orderForm.get('shippingCity')?.invalid && orderForm.get('shippingCity')?.touched)"
+          />
+        </div>}
+        @if(orderForm.get('differentDeliveryAddress')?.value){<div class="row">
+          <input 
+            type="text" 
+            placeholder="Utca, házszám *" 
+            class="input" 
+            formControlName="shippingAddress"
+            [class.error]="orderForm.get('differentDeliveryAddress') && (orderForm.get('shippingAddress')?.invalid && orderForm.get('shippingAddress')?.touched)"
+          />
+        </div>}
+
         <div class="row">
           <textarea 
             placeholder="Megjegyzés" 
@@ -135,18 +170,12 @@
           ></textarea>
         </div>
 
-        <!-- Success animation -->
-        <div *ngIf="orderSuccess()" class="success-animation">
-          <div class="checkmark-circle">
-            <div class="checkmark"></div>
-          </div>
-          <p>Rendelés sikeresen leadva!</p>
-        </div>
+
 
         <!-- Error message -->
-        <div *ngIf="orderError()" class="error-message">
+        @if(orderError()){<div class="error-message">
           ⚠️ {{ orderError() }}
-        </div>
+        </div>}
 
         <label class="policy">
           <input 
@@ -161,11 +190,11 @@
             class="submit"
             [disabled]="!canSubmitOrder"
           >
-            <span *ngIf="orderLoading()" class="loading-spinner"></span>
+            @if(orderLoading()){<span class="loading-spinner"></span>}
             {{ orderLoading() ? 'Rendelés leadása...' : 'Rendelés leadása' }}
           </button>
         </div>
       </form>
     </div>
-  </section>
+  </section>}
 </div>

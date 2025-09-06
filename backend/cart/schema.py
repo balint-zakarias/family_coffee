@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from django.db.models import Sum
 
 from .models import Cart, CartItem
 from .utils import get_or_create_cart
@@ -15,16 +16,32 @@ class CartItemType(DjangoObjectType):
 class CartType(DjangoObjectType):
     total_items = graphene.Int()
     total_price = graphene.Decimal()
+    subtotal = graphene.Decimal()
 
     class Meta:
         model = Cart
-        fields = ("id", "token", "created_at", "updated_at", "items", "total_items", "total_price")
+        fields = (
+            "id",
+            "token",
+            "created_at",
+            "updated_at",
+            "items",
+            "total_items",
+            "total_price"
+        )
 
     def resolve_total_items(self, info):
         return sum(item.quantity for item in self.items.all())
 
     def resolve_total_price(self, info):
         return sum(item.line_total for item in self.items.all())
+    
+    def resolve_subtotal(self, info):
+        return self.subtotal()
+
+class CartSummaryType(graphene.ObjectType):
+    count = graphene.Int(required=True)
+    subtotal = graphene.Decimal(required=True)    
 
 
 class AddToCart(graphene.Mutation):
@@ -115,7 +132,15 @@ class CartQuery(graphene.ObjectType):
     def resolve_cart(self, info):
         return get_or_create_cart(info.context)
 
+class CartSummaryQuery(graphene.ObjectType):
+    cart_summary = graphene.Field(CartSummaryType)
 
+    def resolve_cart_summary(self, info):
+        cart = get_or_create_cart(info.context)
+        count = cart.items.aggregate(n=Sum("quantity"))["n"] or 0
+
+        return CartSummaryType(count=count, subtotal=cart.subtotal())
+    
 class CartMutation(graphene.ObjectType):
     add_to_cart = AddToCart.Field()
     update_cart_item = UpdateCartItem.Field()

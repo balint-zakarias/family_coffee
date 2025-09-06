@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Graphql } from '../../../../../core/graphql.service';
+import { Graphql } from '../../../core/graphql.service';
 
 // ---- cross-field validator: legalább egy kitöltve az email/telefon közül
 function atLeastOneEmailOrPhone(group: AbstractControl): ValidationErrors | null {
@@ -43,16 +43,15 @@ export class Contact {
     this.form = this.fb.group(
       {
         name: ['', [Validators.required, Validators.maxLength(160)]],
-        email: ['', [Validators.email]],      // opcionális, de ha van, legyen formailag oké
-        phone: [''],                          // opcionális
+        email: ['', [Validators.email]],
+        phone: [''],
         message: ['', [Validators.required]],
         accepted: [false, [Validators.requiredTrue]],
       },
-      { validators: atLeastOneEmailOrPhone }  // ⬅️ email VAGY telefon kötelező
+      { validators: atLeastOneEmailOrPhone } 
     );
   }
 
-  // kényelmi getter, ha szeretnéd a template-ben használni
   get canSubmit(): boolean {
     return this.form.valid && !this.loading;
   }
@@ -80,7 +79,9 @@ export class Contact {
       this.submitted.emit({ name, email, phone, message, accepted });
 
       this.success = true;
-      setTimeout(() => (this.success = false), 3000);
+      setTimeout(() => {
+        this.success = false;
+      }, 3000);
       this.form.reset({ accepted: false });
     } catch (e: any) {
       this.error = e?.message ?? String(e);

@@ -1,23 +1,23 @@
 import { Component, signal, computed } from '@angular/core';
-import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from 'core/cart.service';
-import { Graphql } from '../../../../core/graphql.service';
+import { Graphql } from '../../../core/graphql.service';
 
 type UiCartItem = {
   id: number;
   name: string;
   imageUrl: string;
-  unitPrice: number;   // Ft
+  unitPrice: number;
   qty: number;
-  subtitle?: string;   // pl. „1 x 89.990 Ft”
+  subtitle?: string;
 };
 
 type GqlProduct = {
   id: string;
   name: string;
-  imageUrl: string | null;   // Graphene: image_url -> imageUrl
-  price: string;             // Decimal string
+  imageUrl: string | null;
+  price: string;
 };
 
 type GqlCartItem = {
@@ -35,7 +35,7 @@ type GqlCart = {
 @Component({
   selector: 'page-cart',
   standalone: true,
-  imports: [NgFor, NgIf, DecimalPipe, ReactiveFormsModule],
+  imports: [DecimalPipe, ReactiveFormsModule],
   templateUrl: './cart.html',
   styleUrls: ['./cart.scss']
 })
@@ -62,16 +62,45 @@ export class Cart {
     });
   }
 
+  ngOnInit() {
+    this.orderForm.get('differentDeliveryAddress')?.valueChanges.subscribe((checked: boolean) => {
+      const shippingAddress = this.orderForm.get('shippingAddress');
+      const shippingCity = this.orderForm.get('shippingCity');
+      const shippingZip = this.orderForm.get('shippingZip');
+  
+      if (checked) {
+        shippingAddress?.setValidators([Validators.required, Validators.maxLength(300)]);
+        shippingCity?.setValidators([Validators.required, Validators.maxLength(120)]);
+        shippingZip?.setValidators([Validators.required, Validators.maxLength(20)]);
+      } else {
+        shippingAddress?.clearValidators();
+        shippingCity?.clearValidators();
+        shippingZip?.clearValidators();
+        shippingAddress?.setValue('');
+        shippingCity?.setValue('');
+        shippingZip?.setValue('');
+      }
+  
+      shippingAddress?.updateValueAndValidity();
+      shippingCity?.updateValueAndValidity();
+      shippingZip?.updateValueAndValidity();
+    });
+  }
+
   constructor(private cartService: CartService, private fb: FormBuilder, private gql: Graphql) {
     this.orderForm = this.fb.group({
       customerName: ['', [Validators.required, Validators.maxLength(160)]],
-      customerEmail: ['', [Validators.email]],
+      customerEmail: ['', [Validators.email, Validators.required]],
       customerPhone: ['', [Validators.required]],
-      shippingAddress: ['', [Validators.required, Validators.maxLength(300)]],
-      shippingCity: ['', [Validators.required, Validators.maxLength(120)]],
-      shippingZip: ['', [Validators.required, Validators.maxLength(20)]],
+      billingAddress: ['', [Validators.required, Validators.maxLength(300)]],
+      billingCity: ['', [Validators.required, Validators.maxLength(120)]],
+      billingZip: ['', [Validators.required, Validators.maxLength(20)]],
+      shippingAddress: [''],
+      shippingCity: [''],
+      shippingZip: [''],
       deliveryNotes: ['', [Validators.maxLength(300)]],
-      acceptedPolicy: [false, [Validators.requiredTrue]]
+      acceptedPolicy: [false, [Validators.requiredTrue]],
+      differentDeliveryAddress: [false]
     });
 
     this.cartService
@@ -84,7 +113,6 @@ export class Cart {
 
   // ---- Helpers ----
   private fmtSubtitle(qty: number, unitPrice: number) {
-    // csak a vizuális string; a sablonban az ár úgyis pipelve van
     const parts = unitPrice.toLocaleString('hu-HU');
     return `${qty} x ${parts} Ft`;
   }
@@ -207,10 +235,14 @@ export class Cart {
         customerName: formData.customerName,
         customerEmail: formData.customerEmail || null,
         customerPhone: formData.customerPhone,
+        billingAddress: formData.billingAddress,
+        billingCity: formData.billingCity,
+        billingZip: formData.billingZip,
         shippingAddress: formData.shippingAddress,
         shippingCity: formData.shippingCity,
         shippingZip: formData.shippingZip,
         deliveryNotes: formData.deliveryNotes || '',
+        differentDeliveryAddress: formData.differentDeliveryAddress,
         grandTotal: this.total()
       };
 

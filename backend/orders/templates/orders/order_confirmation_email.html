@@ -112,6 +112,7 @@
     </style>
 </head>
 <body>
+    {% load humanize %}
     <div class="container">
         <div class="header">
             <h1>Family Coffee</h1>
@@ -122,33 +123,40 @@
             <div class="order-info">
                 <h2>Rendelés részletei</h2>
                 <div class="info-row">
-                    <span class="info-label">Rendelés azonosító:</span>
+                    <span class="info-label">Rendelés azonosító: </span>
                     <span><strong>{{ order.order_id }}</strong></span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Dátum:</span>
+                    <span class="info-label">Dátum: </span>
                     <span>{{ order.created_at|date:"Y. m. d. H:i" }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Név:</span>
+                    <span class="info-label">Név: </span>
                     <span>{{ order.customer_name }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Email:</span>
+                    <span class="info-label">Email: </span>
                     <span>{{ order.customer_email }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Telefon:</span>
+                    <span class="info-label">Telefon: </span>
                     <span>{{ order.customer_phone }}</span>
                 </div>
             </div>
 
             <div class="order-info">
+                <h2>Számlázási cím</h2>
+                <p>
+                    {{ order.billing_address }}<br>
+                    {{ order.billing_city }}, {{ order.billing_zip }}
+                </p>
+                {% if order.different_delivery_address %}
                 <h2>Szállítási cím</h2>
                 <p>
                     {{ order.shipping_address }}<br>
                     {{ order.shipping_city }}, {{ order.shipping_zip }}
                 </p>
+                {% endif %}
                 {% if order.delivery_notes %}
                 <p><strong>Megjegyzés:</strong> {{ order.delivery_notes }}</p>
                 {% endif %}
@@ -160,15 +168,15 @@
                 <div class="product-item">
                     <div>
                         <div class="product-name">{{ item.name_snapshot }}</div>
-                        <div class="product-details">{{ item.quantity }} db × {{ item.unit_price_snapshot }} Ft</div>
+                        <div class="product-details">{{ item.quantity }} db × {{ item.unit_price_snapshot|floatformat:0|intcomma }} Ft</div>
                     </div>
-                    <div class="product-price">{{ item.line_total }} Ft</div>
+                    <div class="product-price"> {{ item.line_total|floatformat:0|intcomma }} Ft</div>
                 </div>
                 {% endfor %}
             </div>
 
             <div class="total">
-                <p class="total-amount">Összesen: {{ order.grand_total }} Ft</p>
+                <p class="total-amount">Összesen: {{ order.grand_total|floatformat:0|intcomma }} Ft</p>
             </div>
 
             <div class="contact-info">

@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
 import { List } from '../list/list';
-import { Graphql } from '../../../../core/graphql.service';
+import { Graphql } from '../../../core/graphql.service';
 
 
 type SiteContent = {
@@ -11,7 +10,7 @@ type SiteContent = {
 @Component({
   selector: 'page-webshop',
   standalone: true,
-  imports: [NgIf, NgFor, List],
+  imports: [List],
   templateUrl: './webshop.html',
   styleUrls: ['./webshop.scss'],
 })

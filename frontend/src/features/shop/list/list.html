@@ -6,19 +6,18 @@
       [value]="search()"
       (input)="onSearchChange(($any($event.target)).value)"
     >
-    <button 
-      *ngIf="search()" 
+    @if(search()){<button 
       class="clear-btn" 
       (click)="clearSearch()"
       type="button"
     >
       ×
-    </button>
+    </button>}
   </div>
 </section>
 
 <!-- Kategória chipek -->
-<div class="categories" *ngIf="categories().length">
+@if(categories().length){<div class="categories">
   <button
     class="chip"
     [class.active]="!selectedCategory()"
@@ -27,41 +26,41 @@
     Összes
   </button>
 
-  <button
+  @for (c of categories(); track c.slug){<button
     class="chip"
-    *ngFor="let c of categories()"
     [class.active]="selectedCategory() === c.slug"
     (click)="selectCategory(c.slug)"
   >
     {{ c.name }}
-  </button>
-</div>
+  </button>}
+</div>}
 
 <div class="products-container">
-  <section *ngIf="loading()" class="loading">
+  @if(loading()){<section class="loading">
     <div class="spinner"></div>
     <p>Betöltés…</p>
-  </section>
+  </section>}
 
-  <section *ngIf="error()" class="error">Hiba: {{ error() }}</section>
+  @if(error()){<section class="error">Hiba: {{ error() }}</section>}
 
-  <section class="grid" *ngIf="!loading() && !error() && products().length > 0">
-    <ui-product-card *ngFor="let p of products()" 
+  @if(!loading() && !error() && products().length > 0){<section class="grid">
+    @for(p of products(); track p.id){<ui-product-card 
     [product]="p"
+    [globalDisabled]="addingToCart()"
     (addToCart)="onAddToCart($event)"
     (viewDetails)="onViewDetails($event)"
-    ></ui-product-card>
-  </section>
+    ></ui-product-card>}
+  </section>}
 
-  <section class="empty-products" *ngIf="!loading() && !error() && products().length === 0">
+  @if(!loading() && !error() && products().length === 0){<section class="empty-products">
     <div class="empty-content">
       <div class="empty-icon">📦</div>
       <h2>Nincs találat</h2>
-      <p *ngIf="search() || selectedCategory()">A keresési feltételeknek megfelelő termék nem található.</p>
-      <p *ngIf="!search() && !selectedCategory()">Jelenleg nincsenek elérhető termékek.</p>
-      <button class="clear-filters-btn" *ngIf="search() || selectedCategory()" (click)="clearFilters()">
+      @if(search() || selectedCategory()){<p>A keresési feltételeknek megfelelő termék nem található.</p>}
+      @if(!search() && !selectedCategory()){<p>Jelenleg nincsenek elérhető termékek.</p>}
+      @if(search() || selectedCategory()){<button class="clear-filters-btn" (click)="clearFilters()">
         Szűrők törlése
-      </button>
+      </button>}
     </div>
-  </section>
+  </section>}
 </div>

@@ -5,10 +5,41 @@ from .models import SiteContent, SiteSettings
 
 
 class SiteContentType(DjangoObjectType):
+    hero_image_url = graphene.String()
+    about_image_url = graphene.String()
+    webshop_image_url = graphene.String()
     class Meta:
         model = SiteContent
-        fields = ("id", "hero_title", "hero_subtitle", "hero_image", "about_title", "about_body", "updated_at")
+        fields = (
+            "id",
+            "hero_title",
+            "hero_subtitle",
+            "hero_image",
+            "hero_button_text",
+            "hero_button_url",
+            "hero_image",
+            "about_title",
+            "about_subtitle",
+            "about_image",
+            "about_body",
+            "webshop_image",
+            "updated_at"
+        )
 
+    def resolve_hero_image_url(self, info):
+        if self.hero_image:
+            return info.context.build_absolute_uri(self.hero_image.url)
+        return None
+    
+    def resolve_about_image_url(self, info):
+        if self.about_image:
+            return info.context.build_absolute_uri(self.about_image.url)
+        return None
+    
+    def resolve_webshop_image_url(self, info):
+        if self.webshop_image:
+            return info.context.build_absolute_uri(self.webshop_image.url)
+        return None
 
 class SiteSettingsType(DjangoObjectType):
     class Meta:

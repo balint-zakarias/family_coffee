@@ -1,31 +1,31 @@
 <main class="product-main">
   
   <!-- Loading state -->
-  <section *ngIf="loading()" class="loading-section">
+  @if (loading()) {<section class="loading-section">
     <div class="loading-spinner"></div>
     <p>Termék betöltése...</p>
-  </section>
+  </section> }
 
   <!-- Error state -->
-  <section *ngIf="error()" class="error-section">
+  @if(error()){<section class="error-section">
     <div class="error-icon">⚠️</div>
     <h2>Hiba történt</h2>
     <p>{{ error() }}</p>
     <button type="button" class="btn btn-primary" (click)="goBack()">
       Vissza a webshopba
     </button>
-  </section>
+  </section>}
 
   <!-- Product details -->
-  <section *ngIf="!loading() && !error() && product()" class="product-section">
+  @if(!loading() && !error() && product()){<section class="product-section">
     <div class="product-container">
       
       <!-- Breadcrumb -->
       <nav class="breadcrumb">
         <a (click)="goBack()" class="breadcrumb-link">Webshop</a>
         <span class="breadcrumb-separator">›</span>
-        <span *ngIf="product()?.category" class="breadcrumb-item">{{ product()?.category?.name }}</span>
-        <span *ngIf="product()?.category" class="breadcrumb-separator">›</span>
+        @if(product()?.category){<span class="breadcrumb-item">{{ product()?.category?.name }}</span>}
+        @if(product()?.category){<span class="breadcrumb-separator">›</span>}
         <span class="breadcrumb-current">{{ product()?.name }}</span>
       </nav>
 
@@ -48,23 +48,23 @@
           </div>
 
           <div class="product-meta">
-            <div class="product-category" *ngIf="product()?.category">
+            @if (product()?.category) {<div class="product-category">
               <span class="meta-label">Kategória:</span>
               <span class="meta-value">{{ product()?.category?.name }}</span>
-            </div>
+            </div>}
             <div class="product-sku">
               <span class="meta-label">Cikkszám:</span>
               <span class="meta-value">{{ product()?.sku }}</span>
             </div>
           </div>
 
-          <div class="product-description" *ngIf="product()?.description">
+          @if (product()?.description) {<div class="product-description">
             <h3>Leírás</h3>
             <p>{{ product()?.description }}</p>
-          </div>
+          </div>}
 
           <!-- Add to cart section -->
-          <div class="add-to-cart-section" *ngIf="product()?.stockQty && (product()?.stockQty || 0) > 0">
+          @if (product()?.stockQty && (product()?.stockQty || 0) > 0) { <div class="add-to-cart-section">
             <div class="quantity-selector">
               <label class="quantity-label">Mennyiség:</label>
               <div class="quantity-controls">
@@ -86,19 +86,19 @@
               (click)="addToCart()"
               [disabled]="addingToCart()"
             >
-              <span *ngIf="addingToCart()" class="btn-spinner"></span>
+              @if(addingToCart()){<span class="btn-spinner"></span>}
               {{ addingToCart() ? 'Hozzáadás...' : 'Kosárba' }}
             </button>
-          </div>
+          </div> }
 
           <!-- Out of stock -->
-          <div class="out-of-stock" *ngIf="!product()?.stockQty || product()?.stockQty === 0">
+          @if (!product()?.stockQty || product()?.stockQty === 0) { <div class="out-of-stock">
             <p>Ez a termék jelenleg nincs készleten.</p>
-          </div>
+          </div>}
 
         </div>
       </div>
     </div>
-  </section>
+  </section>}
 
 </main>

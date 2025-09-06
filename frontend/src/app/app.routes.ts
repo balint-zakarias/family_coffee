@@ -1,9 +1,8 @@
 import { Routes } from '@angular/router';
-import { Home } from '@features/shop/pages/home/home';
-import { List } from '@features/shop/pages/list/list';
-import { Cart } from '@features/shop/pages/cart/cart';
-import { Webshop } from '@features/shop/pages/webshop/webshop';
-import { Product } from '@features/shop/pages/product/product';
+import { Home } from '@features/home/home';
+import { Cart } from '@features/shop/cart/cart';
+import { Webshop } from '@features/shop/webshop/webshop';
+import { Product } from '@features/shop/product/product';
 import { Privacy } from '@features/legal/pages/privacy/privacy';
 import { Login } from '@features/auth/pages/login/login';
 import { Dashboard } from '@features/dashboard/pages/dashboard/dashboard';

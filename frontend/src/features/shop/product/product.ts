@@ -1,10 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { NgIf, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Graphql } from '../../../../core/graphql.service';
-import { CartService } from '../../../../core/cart.service';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { Graphql } from '../../../core/graphql.service';
+import { CartService } from '../../../core/cart.service';
 
 interface ProductDetail {
   id: number;
@@ -24,7 +23,7 @@ interface ProductDetail {
 @Component({
   selector: 'page-product',
   standalone: true,
-  imports: [NgIf, CurrencyPipe, FormsModule, DecimalPipe],
+  imports: [FormsModule, DecimalPipe],
   templateUrl: './product.html',
   styleUrls: ['./product.scss'],
 })

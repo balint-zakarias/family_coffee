@@ -31,13 +31,16 @@ class OrderItemInput(graphene.InputObjectType):
 
 class OrderInput(graphene.InputObjectType):
     customer_name = graphene.String(required=True)
-    customer_email = graphene.String(required=True)
+    customer_email = graphene.String(required=False)
     customer_phone = graphene.String(required=True)
-    shipping_address = graphene.String(required=True)
-    shipping_city = graphene.String(required=True)
-    shipping_zip = graphene.String(required=True)
+    billing_address = graphene.String(required=True)
+    billing_city = graphene.String(required=True)
+    billing_zip = graphene.String(required=True)
+    shipping_address = graphene.String(required=False)
+    shipping_city = graphene.String(required=False)
+    shipping_zip = graphene.String(required=False)
+    different_delivery_address = graphene.Boolean(required=True)
     delivery_notes = graphene.String()
-    subtotal = graphene.Decimal(required=True)
     grand_total = graphene.Decimal(required=True)
 
 
@@ -64,9 +67,13 @@ class CreateOrder(graphene.Mutation):
                 customer_name=input.customer_name,
                 customer_email=input.customer_email,
                 customer_phone=input.customer_phone,
+                billing_address=input.billing_address,
+                billing_city=input.billing_city,
+                billing_zip=input.billing_zip,
                 shipping_address=input.shipping_address,
                 shipping_city=input.shipping_city,
                 shipping_zip=input.shipping_zip,
+                different_delivery_address=input.different_delivery_address,
                 delivery_notes=input.delivery_notes or "",
                 subtotal=subtotal,
                 grand_total=subtotal,

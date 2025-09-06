@@ -9,8 +9,15 @@
     <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
 
     <div class="actions">
-      <button class="cart" type="button" (click)="handleAdd()">Kosárba</button>
-      <button class="details" type="button" (click)="handleDetails()">Részletek</button>
+      <div class="cart-wrapper" [class.show-success]="showSuccess">
+        <button class="cart" type="button" (click)="handleAdd()" [disabled]="isDisabled">
+          Kosárba
+        </button>
+        <div class="success-message">
+          <span class="checkmark">✔</span> Kosárba helyezve!
+        </div>
+      </div>
+      <button class="details" type="button" (click)="handleDetails()" [disabled]="isDisabled">Részletek</button>
     </div>
   </div>
 </article>

@@ -23,23 +23,23 @@
     </section>
 
     <!-- Loading -->
-    <section *ngIf="loading()" class="loading-section">
+    @if(loading()){<section class="loading-section">
       <div class="loading-spinner"></div>
       <p>Rendelések betöltése...</p>
-    </section>
+    </section>}
 
     <!-- Error -->
-    <section *ngIf="error()" class="error-section">
+    @if(error()){<section class="error-section">
       <div class="error-icon">⚠️</div>
       <h3>Hiba történt</h3>
       <p>{{ error() }}</p>
       <button type="button" class="btn btn-primary" (click)="loadOrders()">
         Újrapróbálás
       </button>
-    </section>
+    </section>}
 
     <!-- Orders Table -->
-    <section *ngIf="!loading() && !error()" class="table-section">
+    @if(!loading() && !error()){<section class="table-section">
       <div class="table-container">
         <table class="orders-table">
           <thead>
@@ -55,7 +55,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let order of orders()" class="order-row">
+            @for(order of orders(); track order.id){<tr class="order-row">
               <!-- Order ID -->
               <td class="order-id">
                 <strong>#{{ order.id }}</strong>
@@ -68,7 +68,7 @@
 
               <!-- Contact -->
               <td class="contact-info">
-                <div class="email" *ngIf="order.customerEmail">{{ order.customerEmail }}</div>
+                @if(order.customerEmail){<div class="email">{{ order.customerEmail }}</div>}
                 <div class="phone">{{ order.customerPhone }}</div>
               </td>
 
@@ -82,9 +82,9 @@
               <td class="items-info">
                 <div class="items-count">{{ getTotalItems(order) }} tétel</div>
                 <div class="items-detail">
-                  <div *ngFor="let item of order.items" class="item-line">
+                  @for(item of order.items; track item){<div class="item-line">
                     {{ item.nameSnapshot }} ({{ item.quantity }}x)
-                  </div>
+                  </div>}
                 </div>
               </td>
 
@@ -111,18 +111,18 @@
               <td class="date-cell">
                 {{ order.createdAt | date:'yyyy.MM.dd HH:mm' }}
               </td>
-            </tr>
+            </tr>}
           </tbody>
         </table>
 
         <!-- Empty state -->
-        <div *ngIf="orders().length === 0" class="empty-state">
+        @if(orders().length === 0){<div class="empty-state">
           <div class="empty-icon">📦</div>
           <h3>Nincsenek rendelések</h3>
           <p>Még nem érkezett be rendelés a kiválasztott szűrőkkel.</p>
-        </div>
+        </div>}
       </div>
-    </section>
+    </section>}
 
   </div>
 </main>

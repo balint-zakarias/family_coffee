@@ -1,18 +1,17 @@
 <div class="home-page">
   <!-- Hiba -->
-  <section *ngIf="error()" class="container" style="padding: 16px;">
+  @if(error()){<section class="container" style="padding: 16px;">
     <p>Hiba történt a kezdőlap betöltése közben: {{ error() }}</p>
-  </section>
+  </section>}
 
   <!-- Hero -->
-  <section-hero
-    *ngIf="!error()"
+  @if(!error()){<section-hero
     [imageUrl]="heroImageUrl() || ''"
     [title]="title() || ''"
     [subtitle]="subtitle() || ''"
     [ctaText]="ctaText() || ''"
     [ctaLink]="ctaLink() || ''"
-  ></section-hero>
+  />}
 
   <!-- Popular Products -->
   <app-popular-products [products]="popularProducts()"></app-popular-products>
