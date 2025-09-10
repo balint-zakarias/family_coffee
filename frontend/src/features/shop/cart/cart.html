@@ -61,7 +61,9 @@
           (click)="remove(it.id)"
           [disabled]="isPending(it.id)"
           [attr.aria-label]="'Tétel törlése: ' + it.name"
-        >🗑️</button>
+        >
+        <mat-icon>delete</mat-icon>
+      </button>
       </div>}
     </div>
 

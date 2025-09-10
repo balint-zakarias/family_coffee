@@ -32,14 +32,13 @@
               [value]="searchTerm()"
               (input)="onSearchChange($any($event.target).value)"
             />
-            <button 
-              *ngIf="searchTerm()" 
+            @if(searchTerm()){<button 
               class="clear-btn" 
               (click)="clearSearch()"
               type="button"
             >
               ×
-            </button>
+            </button>}
           </div>
         </div>
 
@@ -53,12 +52,11 @@
             (change)="onCategoryChange($any($event.target).value)"
           >
             <option value="">Minden kategória</option>
-            <option 
-              *ngFor="let category of categories()" 
+            @for(category of categories(); track category.id){<option 
               [value]="category.id"
             >
               {{ category.name }}
-            </option>
+            </option>}
           </select>
         </div>
 
@@ -77,28 +75,28 @@
     </section>
 
     <!-- Loading state -->
-    <section *ngIf="loading()" class="loading-section">
+    @if(loading()){<section class="loading-section">
       <div class="loading-spinner"></div>
       <p>Termékek betöltése...</p>
-    </section>
+    </section>}
 
     <!-- Error state -->
-    <section *ngIf="error()" class="error-section">
+    @if(error()){<section class="error-section">
       <div class="error-icon">⚠️</div>
       <h3>Hiba történt</h3>
       <p>{{ error() }}</p>
       <button type="button" class="btn btn-secondary" (click)="loadData()">
         Újrapróbálás
       </button>
-    </section>
+    </section>}
 
     <!-- Products table -->
-    <section *ngIf="!loading() && !error()" class="products-section">
+    @if(!loading() && !error()){<section class="products-section">
       <div class="products-header">
         <h2>Termékek ({{ products().length }})</h2>
       </div>
 
-      <div class="products-table-container" *ngIf="products().length > 0">
+      @if(products().length > 0){<div class="products-table-container">
         <table class="products-table">
           <thead>
             <tr>
@@ -114,7 +112,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let product of products(); trackBy: trackByProductId" class="product-row">
+            @for(product of products(); track trackByProductId($index, product)){<tr class="product-row">
               <!-- Product image -->
               <td class="product-image-cell">
                 <img 
@@ -128,19 +126,19 @@
               <!-- Product info -->
               <td class="product-info-cell">
                 <div class="product-name">{{ product.name }}</div>
-                <div class="product-description" *ngIf="product.description">
+                @if(product.description){<div class="product-description">
                   {{ product.description.length > 100 ? (product.description | slice:0:100) + '...' : product.description }}
-                </div>
+                </div>}
               </td>
 
               <!-- Category -->
               <td class="category-cell">
-                <span class="category-badge" *ngIf="product.category">
+                @if(product.category){<span class="category-badge">
                   {{ product.category.name }}
-                </span>
-                <span class="no-category" *ngIf="!product.category">
+                </span>}
+                @if(!product.category){<span class="no-category">
                   Nincs kategória
-                </span>
+                </span>}
               </td>
 
               <!-- SKU -->
@@ -150,7 +148,7 @@
 
               <!-- Price -->
               <td class="price-cell">
-                <span class="price">{{ product.price | currency:'HUF':'symbol':'1.0-0' }}</span>
+                <span class="price">{{ product.price | number:'1.0-0' }} Ft</span>
               </td>
 
               <!-- Stock -->
@@ -192,21 +190,34 @@
                   </button>
                 </div>
               </td>
-            </tr>
+            </tr>}
           </tbody>
         </table>
-      </div>
+        
+        <!-- Load More Button -->
+        @if(hasMore() && products().length > 0){<div class="load-more-container">
+          <button 
+            #loadMoreBtn
+            class="load-more-btn"
+            (click)="loadMore()"
+            [disabled]="loading()"
+          >
+            @if(loading()){<span class="spinner-small"></span>}
+            {{ loading() ? 'Betöltés...' : 'További termékek betöltése' }}
+          </button>
+        </div>}
+      </div>}
 
       <!-- Empty state -->
-      <div class="empty-state" *ngIf="products().length === 0">
+      @if(products().length === 0){<div class="empty-state">
         <div class="empty-icon">📦</div>
         <h3>Nincsenek termékek</h3>
         <p>A megadott szűrőknek megfelelő termékek nem találhatók.</p>
         <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
           Új termék hozzáadása
         </button>
-      </div>
-    </section>
+      </div>}
+    </section>}
 
   </div>
 </main>

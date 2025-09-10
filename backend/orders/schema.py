@@ -2,16 +2,27 @@ import graphene
 from graphene_django import DjangoObjectType
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.db.models import Sum
 
 from .models import Order, OrderItem
 from catalog.models import Product
 from cart.utils import get_or_create_cart
 
 
+class DashboardStatsType(graphene.ObjectType):
+    active_products_count = graphene.Int()
+    total_orders_count = graphene.Int()
+    delivered_orders_revenue = graphene.Float()
+
+
 class OrderItemType(DjangoObjectType):
+    sku = graphene.String()
     class Meta:
         model = OrderItem
         fields = ("id", "product", "name_snapshot", "unit_price_snapshot", "quantity", "line_total")
+
+    def resolve_sku(self, info):
+        return self.product.sku if self.product else None    
 
 
 class OrderType(DjangoObjectType):
@@ -20,7 +31,8 @@ class OrderType(DjangoObjectType):
         fields = (
             "id", "order_id", "customer_name", "customer_email", "customer_phone",
             "shipping_address", "shipping_city", "shipping_zip", "delivery_notes",
-            "subtotal", "grand_total", "status", "created_at", "updated_at", "items"
+            "subtotal", "grand_total", "status", "created_at", "updated_at", "items",
+            "billing_address", "billing_city", "billing_zip", "different_delivery_address"
         )
 
 
@@ -136,17 +148,34 @@ class UpdateOrderStatus(graphene.Mutation):
 
 
 class OrdersQuery(graphene.ObjectType):
-    orders = graphene.List(OrderType)
+    orders = graphene.List(OrderType, status=graphene.String())
     order = graphene.Field(OrderType, order_id=graphene.String(required=True))
+    dashboard_stats = graphene.Field(DashboardStatsType)
 
-    def resolve_orders(self, info):
-        return Order.objects.all().order_by('-created_at')
+    def resolve_orders(self, info, status=None):
+        queryset = Order.objects.all().order_by('-created_at')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
 
     def resolve_order(self, info, order_id):
         try:
             return Order.objects.get(order_id=order_id)
         except Order.DoesNotExist:
             return None
+
+    def resolve_dashboard_stats(self, info):
+        active_products_count = Product.objects.filter(is_active=True).count()
+        total_orders_count = Order.objects.count()
+        delivered_orders_revenue = Order.objects.filter(status='delivered').aggregate(
+            total=Sum('grand_total')
+        )['total'] or 0
+
+        return DashboardStatsType(
+            active_products_count=active_products_count,
+            total_orders_count=total_orders_count,
+            delivered_orders_revenue=float(delivered_orders_revenue)
+        )
 
 
 class OrdersMutation(graphene.ObjectType):

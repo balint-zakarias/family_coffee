@@ -23,6 +23,11 @@ export class List implements OnInit {
   categories = signal<Category[]>([]);
   selectedCategory = signal<string | null>(null);
   search = signal<string>('');
+  
+  // Pagination
+  currentPage = signal<number>(1);
+  pageSize = 50;
+  hasMore = signal<boolean>(true);
 
   constructor(
     private gql: Graphql,
@@ -42,14 +47,15 @@ export class List implements OnInit {
     });
   }
 
-  async load() {
+  async load(loadMore = false): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
 
-    // ⬇️ Slugot kér a backend (String)
+    const offset = loadMore ? (this.currentPage() - 1) * this.pageSize : 0;
+
     const query = `
-      query($search: String, $limit: Int, $categorySlug: String) {
-        products(search: $search, categorySlug: $categorySlug, limit: $limit) {
+      query($search: String, $limit: Int, $offset: Int, $categorySlug: String) {
+        products(search: $search, categorySlug: $categorySlug, limit: $limit, offset: $offset) {
           id
           name
           slug
@@ -61,18 +67,37 @@ export class List implements OnInit {
     `;
 
     try {
-      const variables: any = { search: this.search()};
+      const variables: any = { 
+        search: this.search(),
+        limit: this.pageSize,
+        offset: offset
+      };
       if (this.selectedCategory()) variables.categorySlug = this.selectedCategory();
 
       const data = await this.gql.query<{products: UiProduct[]}>(
         query,
         variables
       );
-      this.products.set(data.products);
+      
+      if (loadMore) {
+        this.products.update(current => [...current, ...data.products]);
+      } else {
+        this.products.set(data.products);
+        this.currentPage.set(1);
+      }
+      
+      this.hasMore.set(data.products.length === this.pageSize);
     } catch (e: any) {
       this.error.set(String(e?.message || e));
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  loadMore() {
+    if (this.hasMore() && !this.loading()) {
+      this.currentPage.update(page => page + 1);
+      this.load(true);
     }
   }
 

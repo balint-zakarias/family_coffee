@@ -99,6 +99,30 @@ class UpdateCartItem(graphene.Mutation):
             raise Exception("Kosár elem nem található")
 
 
+class SetQuantity(graphene.Mutation):
+    class Arguments:
+        item_id = graphene.ID(required=True)
+        quantity = graphene.Int(required=True)
+
+    cart = graphene.Field(CartType)
+    success = graphene.Boolean()
+
+    def mutate(self, info, item_id, quantity):
+        try:
+            cart = get_or_create_cart(info.context)
+            cart_item = CartItem.objects.get(cart=cart, id=item_id)
+            
+            if quantity <= 0:
+                cart_item.delete()
+            else:
+                cart_item.quantity = quantity
+                cart_item.save()
+            
+            return SetQuantity(cart=cart, success=True)
+        except CartItem.DoesNotExist:
+            raise Exception("Kosár elem nem található")
+
+
 class RemoveFromCart(graphene.Mutation):
     class Arguments:
         product_id = graphene.ID(required=True)
@@ -144,5 +168,6 @@ class CartSummaryQuery(graphene.ObjectType):
 class CartMutation(graphene.ObjectType):
     add_to_cart = AddToCart.Field()
     update_cart_item = UpdateCartItem.Field()
+    set_quantity = SetQuantity.Field()
     remove_from_cart = RemoveFromCart.Field()
     clear_cart = ClearCart.Field()

@@ -86,10 +86,10 @@ export class CartService {
     this.recomputeCountFromCart(data.addToCart.cart);
   }
 
-  async setQty(itemId: string, qty: number) {
+  async setQty(productId: string, qty: number) {
     const M = `
-      mutation($id: ID!, $q: Int!) {
-        setQuantity(itemId: $id, quantity: $q) {
+      mutation($productId: ID!, $quantity: Int!) {
+        updateCartItem(productId: $productId, quantity: $quantity) {
           cart {
             subtotal
             items {
@@ -100,15 +100,15 @@ export class CartService {
         }
       }
     `;
-    const data = await this.gql.mutate<{ setQuantity: { cart: UiCart } }>(M, { id: itemId, q: qty });
-    this.cart.set(data.setQuantity.cart);
-    this.recomputeCountFromCart(data.setQuantity.cart);
+    const data = await this.gql.mutate<{ updateCartItem: { cart: UiCart } }>(M, { productId, quantity: qty });
+    this.cart.set(data.updateCartItem.cart);
+    this.recomputeCountFromCart(data.updateCartItem.cart);
   }
 
   async remove(itemId: string) {
     const M = `
       mutation($id: ID!) {
-        removeItem(itemId: $id) {
+        removeFromCart(productId: $id) {
           cart {
             subtotal
             items {
@@ -119,8 +119,8 @@ export class CartService {
         }
       }
     `;
-    const data = await this.gql.mutate<{ removeItem: { cart: UiCart } }>(M, { id: itemId });
-    this.cart.set(data.removeItem.cart);
-    this.recomputeCountFromCart(data.removeItem.cart);
+    const data = await this.gql.mutate<{ removeFromCart: { cart: UiCart } }>(M, { id: itemId });
+    this.cart.set(data.removeFromCart.cart);
+    this.recomputeCountFromCart(data.removeFromCart.cart);
   }
 }

@@ -55,10 +55,10 @@
             </tr>
           </thead>
           <tbody>
-            @for(order of orders(); track order.id){<tr class="order-row">
+            @for(order of orders(); track order.id){<tr class="order-row" (click)="openOrderDetails(order)">
               <!-- Order ID -->
               <td class="order-id">
-                <strong>#{{ order.id }}</strong>
+                <strong>#{{ order.orderId }}</strong>
               </td>
 
               <!-- Customer -->
@@ -74,8 +74,16 @@
 
               <!-- Address -->
               <td class="address-info">
-                <div class="address">{{ order.shippingAddress }}</div>
-                <div class="city">{{ order.shippingCity }}</div>
+                <div class="address-section">
+                  <div class="address-label">Számlázási:</div>
+                  <div class="address">{{ order.billingZip }} {{ order.billingCity }}</div>
+                  <div class="address">{{ order.billingAddress }}</div>
+                </div>
+                <div class="address-section">
+                  <div class="address-label">Szállítási:</div>
+                  <div class="address">{{ order.shippingZip }} {{ order.shippingCity }}</div>
+                  <div class="address">{{ order.shippingAddress }}</div>
+                </div>
               </td>
 
               <!-- Items -->
@@ -95,16 +103,9 @@
 
               <!-- Status -->
               <td class="status-cell">
-                <select 
-                  class="status-select"
-                  [value]="order.status.toLowerCase()"
-                  (change)="updateOrderStatus(order.id, $any($event.target).value)"
-                  [ngClass]="getStatusClass(order.status)"
-                >
-                  <option value="placed">Leadva</option>
-                  <option value="delivered">Kiszállítva</option>
-                  <option value="canceled">Törölve</option>
-                </select>
+                <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                  {{ getStatusText(order.status) }}
+                </span>
               </td>
 
               <!-- Date -->
@@ -126,3 +127,110 @@
 
   </div>
 </main>
+
+<!-- Order Details Modal -->
+@if(showModal() && selectedOrder()){<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Rendelés részletei - #{{ selectedOrder()!.orderId }}</h2>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Customer Info -->
+      <section class="info-section">
+        <h3>Vevő adatok</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Név:</label>
+            <span>{{ selectedOrder()!.customerName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ selectedOrder()!.customerEmail }}</span>
+          </div>
+          <div class="info-item">
+            <label>Telefon:</label>
+            <span>{{ selectedOrder()!.customerPhone }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Addresses -->
+      <section class="info-section">
+        <h3>Címek</h3>
+        <div class="addresses-grid">
+          <div class="address-block">
+            <h4>Számlázási cím</h4>
+            <div class="address-text">
+              {{ selectedOrder()!.billingZip }} {{ selectedOrder()!.billingCity }}<br>
+              {{ selectedOrder()!.billingAddress }}
+            </div>
+          </div>
+          <div class="address-block">
+            <h4>Szállítási cím</h4>
+            <div class="address-text">
+              {{ selectedOrder()!.shippingZip }} {{ selectedOrder()!.shippingCity }}<br>
+              {{ selectedOrder()!.shippingAddress }}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Order Items -->
+      <section class="info-section">
+        <h3>Rendelt tételek</h3>
+        <div class="items-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Cikkszám</th>
+                <th>Termék név</th>
+                <th>Egységár</th>
+                <th>Mennyiség</th>
+                <th>Összesen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(item of selectedOrder()!.items; track item.id){<tr>
+                <td class="item-id">#{{ item.sku }}</td>
+                <td class="item-name">{{ item.nameSnapshot }}</td>
+                <td class="item-price">{{ item.unitPriceSnapshot | number:'1.0-0' }} Ft</td>
+                <td class="item-quantity">{{ item.quantity }}x</td>
+                <td class="item-total">{{ item.lineTotal | number:'1.0-0' }} Ft</td>
+              </tr>}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Order Summary -->
+      <section class="info-section">
+        <h3>Rendelés összesítő</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <label>Státusz módosítása:</label>
+            <select 
+              class="status-select"
+              [value]="selectedOrder()!.status.toLowerCase()"
+              (change)="updateOrderStatus(selectedOrder()!.orderId, $any($event.target).value)"
+              [ngClass]="getStatusClass(selectedOrder()!.status)"
+            >
+              <option value="placed">Leadva</option>
+              <option value="delivered">Kiszállítva</option>
+              <option value="canceled">Törölve</option>
+            </select>
+          </div>
+          <div class="summary-item">
+            <label>Rendelés dátuma:</label>
+            <span>{{ selectedOrder()!.createdAt | date:'yyyy.MM.dd HH:mm' }}</span>
+          </div>
+          <div class="summary-item total">
+            <label>Végösszeg:</label>
+            <span class="total-amount">{{ selectedOrder()!.grandTotal | number:'1.0-0' }} Ft</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>}

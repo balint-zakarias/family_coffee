@@ -9,15 +9,21 @@ interface OrderItem {
   unitPriceSnapshot: number;
   quantity: number;
   lineTotal: number;
+  sku?: string;
 }
 
 interface Order {
   id: number;
+  orderId: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  billingAddress: string;
+  billingCity: string;
+  billingZip: string;
   shippingAddress: string;
   shippingCity: string;
+  shippingZip: string;
   status: string;
   grandTotal: number;
   createdAt: string;
@@ -38,6 +44,10 @@ export class Orders implements OnInit {
   
   // Szűrők
   selectedStatus = signal<string | null>(null);
+  
+  // Modal állapot
+  selectedOrder = signal<Order | null>(null);
+  showModal = signal<boolean>(false);
 
   constructor(private gql: Graphql) {}
 
@@ -53,11 +63,16 @@ export class Orders implements OnInit {
       query GetOrders($status: String) {
         orders(status: $status) {
           id
+          orderId
           customerName
           customerEmail
           customerPhone
+          billingAddress
+          billingCity
+          billingZip
           shippingAddress
           shippingCity
+          shippingZip
           status
           grandTotal
           createdAt
@@ -67,6 +82,7 @@ export class Orders implements OnInit {
             unitPriceSnapshot
             quantity
             lineTotal
+            sku
           }
         }
       }
@@ -116,13 +132,23 @@ export class Orders implements OnInit {
     return order.items.reduce((sum, item) => sum + item.quantity, 0);
   }
 
-  async updateOrderStatus(orderId: number, newStatus: string) {
+  openOrderDetails(order: Order) {
+    this.selectedOrder.set(order);
+    this.showModal.set(true);
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+    this.selectedOrder.set(null);
+  }
+
+  async updateOrderStatus(orderId: string, newStatus: string) {
     const MUTATION = /* GraphQL */ `
-      mutation UpdateOrderStatus($orderId: Int!, $status: String!) {
+      mutation UpdateOrderStatus($orderId: String!, $status: String!) {
         updateOrderStatus(orderId: $orderId, status: $status) {
           success
           order {
-            id
+            orderId
             status
           }
         }
@@ -132,18 +158,25 @@ export class Orders implements OnInit {
     try {
       const result = await this.gql.mutate<{ updateOrderStatus: { success: boolean; order: { id: number; status: string } } }>(
         MUTATION,
-        { orderId: parseInt(orderId.toString()), status: newStatus }
+        { orderId: orderId.toString(), status: newStatus }
       );
 
       if (result.updateOrderStatus.success) {
         // Frissítjük a helyi állapotot
         this.orders.update(orders => 
           orders.map(order => 
-            order.id === orderId 
+            order.orderId === orderId 
               ? { ...order, status: newStatus }
               : order
           )
         );
+
+        // Ha modal nyitva van és ez a rendelés van kiválasztva, frissítjük azt is
+        if (this.selectedOrder() && this.selectedOrder()!.orderId === orderId) {
+          this.selectedOrder.update(order => 
+            order ? { ...order, status: newStatus } : null
+          );
+        }
       }
     } catch (e: any) {
       alert(`Hiba történt: ${e?.message || 'Ismeretlen hiba'}`);

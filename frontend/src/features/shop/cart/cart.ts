@@ -1,11 +1,13 @@
 import { Component, signal, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { CartService } from 'core/cart.service';
 import { Graphql } from '../../../core/graphql.service';
 
 type UiCartItem = {
   id: number;
+  productId: string; // Termék ID a backend számára
   name: string;
   imageUrl: string;
   unitPrice: number;
@@ -35,7 +37,7 @@ type GqlCart = {
 @Component({
   selector: 'page-cart',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule],
+  imports: [DecimalPipe, ReactiveFormsModule, MatIconModule],
   templateUrl: './cart.html',
   styleUrls: ['./cart.scss']
 })
@@ -129,6 +131,7 @@ export class Cart {
   
       return {
         id: Number(it.id),
+        productId: it.product?.id ?? '',
         name: it.product?.name ?? 'Ismeretlen termék',
         imageUrl: img,
         unitPrice: unit,
@@ -160,7 +163,7 @@ export class Cart {
     if (!it) return;
     this.setPending(id, true);
     try {
-      await this.cartService.setQty(String(id), it.qty + 1);
+      await this.cartService.setQty(it.productId, it.qty + 1);
       const c = this.cartService.cart();
       this.items.set(this.mapToUi(((c?.items ?? []) as unknown) as GqlCartItem[]));
     } catch (e: any) {
@@ -173,10 +176,17 @@ export class Cart {
   async dec(id: number) {
     const it = this.items().find(i => i.id === id);
     if (!it) return;
-    const next = Math.max(1, it.qty - 1);
+    const next = it.qty - 1;
+    
     this.setPending(id, true);
     try {
-      await this.cartService.setQty(String(id), next);
+      if (next <= 0) {
+        // Ha 0 vagy kevesebb, töröljük az elemet
+        await this.cartService.remove(it.productId);
+      } else {
+        // Különben frissítjük a mennyiséget
+        await this.cartService.setQty(it.productId, next);
+      }
       const c = this.cartService.cart();
       this.items.set(this.mapToUi(((c?.items ?? []) as unknown) as GqlCartItem[]));
     } catch (e: any) {
@@ -189,7 +199,13 @@ export class Cart {
   async remove(id: number) {
     this.setPending(id, true);
     try {
-      await this.cartService.remove(String(id));
+      // Megkeressük az elemet, hogy megkapjuk a productId-t
+      const item = this.items().find(it => it.id === id);
+      if (!item) {
+        throw new Error('Kosár elem nem található');
+      }
+      
+      await this.cartService.remove(item.productId);
       const c = this.cartService.cart();
       this.items.set(this.mapToUi(((c?.items ?? []) as unknown) as GqlCartItem[]));
     } catch (e: any) {

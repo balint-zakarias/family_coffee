@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
+import { ConfirmationModal } from '@shared/ui/confirmation-modal/confirmation-modal';
 import { Graphql } from '../../../../core/graphql.service';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -17,7 +18,7 @@ interface ContactMessage {
 @Component({
   selector: 'page-contact-forms',
   standalone: true,
-  imports: [DashboardHeader, NgIf, NgFor, DatePipe, MatIconModule],
+  imports: [DashboardHeader, ConfirmationModal, NgIf, NgFor, DatePipe, MatIconModule],
   templateUrl: './contact-forms.html',
   styleUrls: ['./contact-forms.scss'],
 })
@@ -25,6 +26,10 @@ export class ContactForms implements OnInit {
   contactMessages = signal<ContactMessage[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+  
+  // Delete modal state
+  showDeleteModal = signal<boolean>(false);
+  messageToDelete = signal<ContactMessage | null>(null);
 
   constructor(private gql: Graphql) {}
 
@@ -60,10 +65,19 @@ export class ContactForms implements OnInit {
     }
   }
 
-  async deleteContactMessage(id: number) {
-    if (!confirm('Biztosan törölni szeretné ezt az üzenetet?')) {
-      return;
-    }
+  openDeleteModal(message: ContactMessage) {
+    this.messageToDelete.set(message);
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+    this.messageToDelete.set(null);
+  }
+
+  async confirmDelete() {
+    const message = this.messageToDelete();
+    if (!message) return;
 
     const MUTATION = /* GraphQL */ `
       mutation DeleteContactMessage($id: ID!) {
@@ -76,16 +90,18 @@ export class ContactForms implements OnInit {
     try {
       const result = await this.gql.mutate<{ deleteContactMessage: { success: boolean } }>(
         MUTATION,
-        { id: id.toString() }
+        { id: message.id.toString() }
       );
 
       if (result.deleteContactMessage.success) {
         this.contactMessages.update(messages => 
-          messages.filter(message => message.id !== id)
+          messages.filter(msg => msg.id !== message.id)
         );
+        this.closeDeleteModal();
       }
     } catch (e: any) {
-      alert(`Hiba történt: ${e?.message || 'Ismeretlen hiba'}`);
+      this.closeDeleteModal();
+      this.error.set(e?.message || 'Hiba az üzenet törlése során');
     }
   }
 

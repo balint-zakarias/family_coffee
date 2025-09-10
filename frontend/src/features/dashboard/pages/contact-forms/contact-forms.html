@@ -63,7 +63,7 @@
                 <button 
                   type="button" 
                   class="btn btn-danger btn-sm"
-                  (click)="deleteContactMessage(message.id)"
+                  (click)="openDeleteModal(message)"
                   title="Üzenet törlése"
                 >
                 <mat-icon>delete</mat-icon>
@@ -85,3 +85,15 @@
 
   </div>
 </main>
+
+<!-- Delete Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showDeleteModal()"
+  title="Üzenet törlése"
+  [message]="'Biztosan törölni szeretné ' + messageToDelete()?.name + ' üzenetét? Ez a művelet nem vonható vissza.'"
+  confirmText="Törlés"
+  cancelText="Mégse"
+  [isDangerous]="true"
+  (confirm)="confirmDelete()"
+  (cancel)="closeDeleteModal()"
+></app-confirmation-modal>

@@ -33,6 +33,24 @@ class CreateContactMessage(graphene.Mutation):
             raise Exception(str(e))
 
 
+class DeleteContactMessage(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+
+    success = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        try:
+            contact_message = ContactMessage.objects.get(id=id)
+            contact_message.delete()
+            return DeleteContactMessage(success=True)
+        except ContactMessage.DoesNotExist:
+            raise Exception("Kapcsolat üzenet nem található")
+        except Exception as e:
+            raise Exception(str(e))
+
+
 class ContactQuery(graphene.ObjectType):
     contact_messages = graphene.List(ContactMessageType)
 
@@ -42,3 +60,4 @@ class ContactQuery(graphene.ObjectType):
 
 class ContactMutation(graphene.ObjectType):
     create_contact_message = CreateContactMessage.Field()
+    delete_contact_message = DeleteContactMessage.Field()

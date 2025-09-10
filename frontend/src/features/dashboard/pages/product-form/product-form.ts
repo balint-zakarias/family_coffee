@@ -48,6 +48,8 @@ export class ProductForm implements OnInit {
     isActive: true
   });
 
+  selectedFile: File | null = null;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -114,7 +116,7 @@ export class ProductForm implements OnInit {
           id: data.product.id,
           name: data.product.name,
           description: data.product.description || '',
-          price: data.product.price,
+          price: Math.round(data.product.price), // Egész számra kerekítés
           imageUrl: data.product.imageUrl,
           categoryId: data.product.category?.id || null,
           sku: data.product.sku,
@@ -166,34 +168,55 @@ export class ProductForm implements OnInit {
 
   private async createProduct() {
     const MUTATION = /* GraphQL */ `
-      mutation CreateProduct($input: ProductInput!) {
-        createProduct(input: $input) { id }
+      mutation CreateProduct($input: ProductInput!, $image: Upload) {
+        createProduct(input: $input, image: $image) { product { id } }
       }
     `;
 
     const input = {
-      ...this.product(),
-      id: this.product().id ? parseInt(this.product().id!.toString()) : undefined,
+      name: this.product().name,
+      description: this.product().description,
+      price: this.product().price,
+      sku: this.product().sku,
+      stockQty: this.product().stockQty,
+      isActive: this.product().isActive,
       categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
     };
 
-    await this.gql.mutate(MUTATION, { input });
+    const variables: any = { input };
+    if (this.selectedFile) {
+      await this.gql.mutateMultipart(MUTATION, { input, image: this.selectedFile });
+    } else {
+      await this.gql.mutate(MUTATION, variables);
+    }
   }
 
   private async updateProduct() {
     const MUTATION = /* GraphQL */ `
-      mutation UpdateProduct($slug: String!, $input: ProductInput!) {
-        updateProduct(slug: $slug, input: $input) { id }
+      mutation UpdateProduct($input: ProductInput!, $image: Upload) {
+        updateProduct(input: $input, image: $image) { id }
       }
-    `;
+    `
 
     const input = {
-      ...this.product(),
-      id: this.product().id ? parseInt(this.product().id!.toString()) : undefined,
+      id: this.product().id,
+      name: this.product().name,
+      description: this.product().description,
+      price: parseFloat(this.product().price?.toString()),
+      sku: this.product().sku,
+      stockQty: this.product().stockQty,
+      isActive: this.product().isActive,
       categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
     };
 
-    await this.gql.mutate(MUTATION, { slug: this.productSlug, input });
+    const variables: any = { input };
+    if (this.selectedFile) {
+      await this.gql.mutateMultipart(MUTATION, { input, image: this.selectedFile });
+    } else {
+      await this.gql.mutate(MUTATION, { input });
+    }
+
+    await this.gql.mutate(MUTATION, variables);
   }
 
   onCancel() {
@@ -211,6 +234,19 @@ export class ProductForm implements OnInit {
 
   get isReadonly(): boolean {
     return this.mode === 'view';
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      // Preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.product.update(p => ({ ...p, imageUrl: e.target?.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   onImageError(event: any) {

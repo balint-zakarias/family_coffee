@@ -88,6 +88,7 @@
               [readonly]="isReadonly"
               min="0"
               step="1"
+              step="1"
               required
             />
           </div>
@@ -127,9 +128,22 @@
             </select>
           </div>
 
+          <!-- Image upload -->
+          <div class="form-group">
+            <label for="imageFile" class="form-label">Kép feltöltése</label>
+            <input
+              type="file"
+              id="imageFile"
+              class="form-input"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              [disabled]="isReadonly"
+            />
+          </div>
+
           <!-- Image URL -->
           <div class="form-group">
-            <label for="imageUrl" class="form-label">Kép URL</label>
+            <label for="imageUrl" class="form-label">Vagy kép URL</label>
             <input
               type="url"
               id="imageUrl"

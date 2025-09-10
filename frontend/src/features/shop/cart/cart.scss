@@ -38,7 +38,7 @@
   
     .line {
       display: grid;
-      grid-template-columns: 1fr auto var(--price-w) auto;
+      grid-template-columns: 1fr auto var(--price-w) 32px;
       align-items: center;
       gap: 16px;
   
@@ -136,6 +136,8 @@
       background: rgba(0,0,0,.06);
       border-radius: 10px;
       padding: 6px;
+      position: relative;
+      z-index: 1;
   
       .qbtn {
         width: 28px;
@@ -172,9 +174,11 @@
       font-variant-numeric: tabular-nums;
       overflow: hidden;
       text-overflow: ellipsis;
+      justify-self: end;
     }
   
     .trash {
+      justify-self: end;
       border: 0;
       background: transparent;
       font-size: 18px;

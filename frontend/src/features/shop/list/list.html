@@ -50,7 +50,19 @@
     (addToCart)="onAddToCart($event)"
     (viewDetails)="onViewDetails($event)"
     ></ui-product-card>}
-  </section>}
+  </section>
+  
+  <!-- Load More Button -->
+  @if(hasMore()){<div class="load-more-container">
+    <button 
+      class="load-more-btn"
+      (click)="loadMore(); $event.preventDefault()"
+      [disabled]="loading()"
+    >
+      @if(loading()){<span class="spinner-small"></span>}
+      {{ loading() ? 'Betöltés...' : 'További termékek' }}
+    </button>
+  </div>}}
 
   @if(!loading() && !error() && products().length === 0){<section class="empty-products">
     <div class="empty-content">

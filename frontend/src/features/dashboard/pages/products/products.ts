@@ -1,6 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgIf, NgFor, CurrencyPipe, DatePipe, SlicePipe } from '@angular/common';
+import { DatePipe, SlicePipe, DecimalPipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
 import { ConfirmationModal } from '@shared/ui/confirmation-modal/confirmation-modal';
 import { Graphql } from '../../../../core/graphql.service';
@@ -33,7 +33,7 @@ interface Category {
 @Component({
   selector: 'page-products',
   standalone: true,
-  imports: [DashboardHeader, ConfirmationModal, NgIf, NgFor, CurrencyPipe, DatePipe, SlicePipe],
+  imports: [DashboardHeader, ConfirmationModal, DecimalPipe, DatePipe, SlicePipe],
   templateUrl: './products.html',
   styleUrls: ['./products.scss'],
 })
@@ -48,9 +48,16 @@ export class Products implements OnInit {
   searchTerm = signal<string>('');
   showInactiveProducts = signal<boolean>(false);
 
+  // Pagination
+  currentPage = signal<number>(1);
+  pageSize = 50;
+  hasMore = signal<boolean>(true);
+
   // Modal state
   showDeleteModal = signal<boolean>(false);
   productToDelete = signal<Product | null>(null);
+
+  @ViewChild('loadMoreBtn') loadMoreBtn!: ElementRef<HTMLButtonElement>;
 
   constructor(
     private router: Router,
@@ -87,13 +94,15 @@ export class Products implements OnInit {
     ]);
   }
 
-  private async loadProducts() {
+  private async loadProducts(loadMore = false): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
 
+    const offset = loadMore ? (this.currentPage() - 1) * this.pageSize : 0;
+
     const QUERY = /* GraphQL */ `
-      query GetProducts($categoryId: Int, $search: String, $isActive: Boolean) {
-        products(categoryId: $categoryId, search: $search, isActive: $isActive, limit: 100) {
+      query GetProducts($categoryId: Int, $search: String, $isActive: Boolean, $limit: Int, $offset: Int) {
+        products(categoryId: $categoryId, search: $search, isActive: $isActive, limit: $limit, offset: $offset) {
           id
           name
           slug
@@ -115,7 +124,10 @@ export class Products implements OnInit {
     `;
 
     try {
-      const variables: any = {};
+      const variables: any = {
+        limit: this.pageSize,
+        offset: offset
+      };
       
       if (this.selectedCategoryId()) {
         variables.categoryId = this.selectedCategoryId();
@@ -132,13 +144,38 @@ export class Products implements OnInit {
       }
 
       const data = await this.gql.query<{ products: Product[] }>(QUERY, variables);
-      this.products.set(data.products || []);
+      
+      if (loadMore) {
+        this.products.update(current => [...current, ...data.products]);
+      } else {
+        this.products.set(data.products || []);
+        this.currentPage.set(1);
+      }
+      
+      this.hasMore.set(data.products.length === this.pageSize);
       
     } catch (e: any) {
       console.error('Error loading products:', e);
       this.error.set(e?.message || 'Hiba a termékek betöltése során');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  loadMore() {
+    if (this.hasMore() && !this.loading()) {
+      this.currentPage.update(page => page + 1);
+      this.loadProducts(true).then(() => {
+        // Scroll to the load more button after content loads
+        setTimeout(() => {
+          if (this.loadMoreBtn) {
+            this.loadMoreBtn.nativeElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 100);
+      });
     }
   }
 
