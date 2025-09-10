@@ -7,7 +7,54 @@ from django.db.models import Sum
 from .models import Order, OrderItem
 from catalog.models import Product
 from cart.utils import get_or_create_cart
+from contentapp.models import SiteSettings
+import logging
+import threading
+from django.db import transaction
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
+logger = logging.getLogger(__name__)
+
+def _send_order_emails(order):
+    try:
+        html_message = render_to_string('orders/order_confirmation_email.html', {'order': order})
+        send_mail(
+            subject=f"Rendelés visszaigazolás #{order.order_id}",
+            message=(
+                f"Kedves {order.customer_name},\n\n"
+                f"Köszönjük rendelését! Azonosító: {order.order_id}\n"
+                f"Összeg: {order.grand_total} Ft\n\n"
+                "Hamarosan felvesszük Önnel a kapcsolatot."
+            ),
+            from_email=None,
+            recipient_list=[order.customer_email] if order.customer_email else [],
+            html_message=html_message,
+            fail_silently=False,
+        )
+
+        merchant_order_email = getattr(SiteSettings.objects.first(), "merchant_order_email", None)
+        print("##########################MERCHANT EMAIL IS: ", merchant_order_email)
+        if merchant_order_email:
+            send_mail(
+                subject=f"Új rendelés érkezett #{order.order_id}",
+                message=(
+                    "Új rendelés érkezett.\n\n"
+                    f"Rendelés azonosítója: {order.order_id}\n"
+                    f"Név: {order.customer_name}\n"
+                    f"E-mail: {order.customer_email}\n"
+                    f"Telefonszám: {order.customer_phone}\n"
+                    f"Összeg: {order.grand_total} Ft\n"
+                ),
+                from_email=None,
+                recipient_list=[merchant_order_email],
+                fail_silently=True,
+            )
+        else:
+            logger.warning("No merchant_order_email configured. Order email not sent. Order ID: %s", order.order_id)
+
+    except Exception:
+        logger.exception("Order emails failed for order_id=%s", getattr(order, "order_id", "unknown"))
 
 class DashboardStatsType(graphene.ObjectType):
     active_products_count = graphene.Int()
@@ -107,26 +154,20 @@ class CreateOrder(graphene.Mutation):
             # Clear cart
             cart.items.all().delete()
 
-            # Send confirmation email with HTML template
-            html_message = render_to_string('orders/order_confirmation_email.html', {
-                'order': order,
-            })
-            
-            send_mail(
-                subject=f"Rendelés visszaigazolás #{order.order_id}",
-                message=f"Kedves {order.customer_name},\n\n"
-                        f"Köszönjük rendelését! A rendelés azonosítója: {order.order_id}\n"
-                        f"Összeg: {order.grand_total} Ft\n\n"
-                        "Hamarosan felvesszük Önnel a kapcsolatot.",
-                from_email=None,
-                recipient_list=[order.customer_email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-            
+            # Cart ürítés után, order mentve…
+            # Emailezés commit után, háttérszálon (fire-and-forget)
+            def _enqueue():
+                try:
+                    threading.Thread(target=_send_order_emails, args=(order,), daemon=True).start()
+                except Exception:
+                    logger.exception("Failed to start email thread for order_id=%s", order.order_id)
+
+            transaction.on_commit(_enqueue)
+
             return CreateOrder(order=order, success=True)
+        
         except Exception as e:
-            raise Exception(str(e))
+            logger.exception("Order creation failed")
 
 
 class UpdateOrderStatus(graphene.Mutation):
@@ -147,16 +188,28 @@ class UpdateOrderStatus(graphene.Mutation):
             raise Exception("Rendelés nem található")
 
 
+class DashboardActivityType(graphene.ObjectType):
+    recent_orders = graphene.List(OrderType)
+    recent_messages = graphene.List('contact.schema.ContactMessageType')
+    recent_products = graphene.List('catalog.schema.ProductType')
+
+
 class OrdersQuery(graphene.ObjectType):
-    orders = graphene.List(OrderType, status=graphene.String())
+    orders = graphene.List(
+        OrderType, 
+        status=graphene.String(),
+        limit=graphene.Int(),
+        offset=graphene.Int()
+    )
     order = graphene.Field(OrderType, order_id=graphene.String(required=True))
     dashboard_stats = graphene.Field(DashboardStatsType)
+    dashboard_activity = graphene.Field(DashboardActivityType)
 
-    def resolve_orders(self, info, status=None):
+    def resolve_orders(self, info, status=None, limit=20, offset=0):
         queryset = Order.objects.all().order_by('-created_at')
         if status:
             queryset = queryset.filter(status=status)
-        return queryset
+        return queryset[offset:offset + limit]
 
     def resolve_order(self, info, order_id):
         try:
@@ -176,6 +229,17 @@ class OrdersQuery(graphene.ObjectType):
             total_orders_count=total_orders_count,
             delivered_orders_revenue=float(delivered_orders_revenue)
         )
+
+
+    def resolve_dashboard_activity(self, info):
+        from contact.models import ContactMessage
+        from catalog.models import Product
+        
+        return {
+            'recent_orders': Order.objects.all().order_by('-created_at')[:5],
+            'recent_messages': ContactMessage.objects.all().order_by('-created_at')[:3],
+            'recent_products': Product.objects.all().order_by('-created_at')[:3]
+        }
 
 
 class OrdersMutation(graphene.ObjectType):

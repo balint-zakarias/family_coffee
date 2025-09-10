@@ -116,6 +116,18 @@
           </tbody>
         </table>
 
+        <!-- Load More Button -->
+        @if(hasMore() && orders().length > 0){<div class="load-more-container">
+          <button 
+            class="load-more-btn"
+            (click)="loadMore()"
+            [disabled]="loading()"
+          >
+            @if(loading()){<span class="spinner-small"></span>}
+            {{ loading() ? 'Betöltés...' : 'További rendelések betöltése' }}
+          </button>
+        </div>}
+
         <!-- Empty state -->
         @if(orders().length === 0){<div class="empty-state">
           <div class="empty-icon">📦</div>

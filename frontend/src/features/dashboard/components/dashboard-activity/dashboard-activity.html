@@ -1,0 +1,81 @@
+<div class="dashboard-activity">
+  <h2>Legutóbbi tevékenységek</h2>
+
+  @if(loading()){<div class="loading">
+    <div class="spinner"></div>
+    <p>Betöltés...</p>
+  </div>}
+
+  @if(error()){<div class="error">
+    <p>{{ error() }}</p>
+  </div>}
+
+  @if(activity()){<div class="activity-sections">
+    
+    <!-- Recent Orders -->
+    <section class="activity-section">
+      <div class="section-header">
+        <h3>Legutóbbi rendelések</h3>
+        <button class="view-all-btn" (click)="navigateToOrders()">Összes megtekintése</button>
+      </div>
+      <div class="activity-list">
+        @for(order of activity()!.recentOrders; track order.id){<div class="activity-item">
+          <div class="item-info">
+            <div class="item-title">#{{ order.orderId }} - {{ order.customerName }}</div>
+            <div class="item-meta">
+              <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                {{ getStatusText(order.status) }}
+              </span>
+              <span class="amount">{{ order.grandTotal | number:'1.0-0' }} Ft</span>
+            </div>
+          </div>
+          <div class="item-date">{{ order.createdAt | date:'MM.dd HH:mm' }}</div>
+        </div>}
+        @if(activity()!.recentOrders.length === 0){<div class="empty-state">
+          Nincsenek rendelések
+        </div>}
+      </div>
+    </section>
+
+    <!-- Recent Messages -->
+    <section class="activity-section">
+      <div class="section-header">
+        <h3>Új üzenetek</h3>
+        <button class="view-all-btn" (click)="navigateToMessages()">Összes megtekintése</button>
+      </div>
+      <div class="activity-list">
+        @for(message of activity()!.recentMessages; track message.id){<div class="activity-item">
+          <div class="item-info">
+            <div class="item-title">{{ message.name }}</div>
+            <div class="item-meta">{{ message.email }}</div>
+          </div>
+          <div class="item-date">{{ message.createdAt | date:'MM.dd HH:mm' }}</div>
+        </div>}
+        @if(activity()!.recentMessages.length === 0){<div class="empty-state">
+          Nincsenek üzenetek
+        </div>}
+      </div>
+    </section>
+
+    <!-- Recent Products -->
+    <section class="activity-section">
+      <div class="section-header">
+        <h3>Új termékek</h3>
+        <button class="view-all-btn" (click)="navigateToProducts()">Összes megtekintése</button>
+      </div>
+      <div class="activity-list">
+        @for(product of activity()!.recentProducts; track product.id){<div class="activity-item">
+          <div class="item-info">
+            <div class="item-title">{{ product.name }}</div>
+            <div class="item-meta">{{ product.price | number:'1.0-0' }} Ft</div>
+          </div>
+          <div class="item-date">{{ product.createdAt | date:'MM.dd HH:mm' }}</div>
+        </div>}
+        @if(activity()!.recentProducts.length === 0){<div class="empty-state">
+          Nincsenek termékek
+        </div>}
+      </div>
+    </section>
+
+  </div>}
+</div>

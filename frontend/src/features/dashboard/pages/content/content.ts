@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
 import { Graphql } from '../../../../core/graphql.service';
 
@@ -26,7 +27,7 @@ export class Content implements OnInit {
   success = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder, private gql: Graphql) {
+  constructor(private fb: FormBuilder, private gql: Graphql, private router: Router) {
     this.contentForm = this.fb.group({
       heroTitle: ['', [Validators.required, Validators.maxLength(200)]],
       heroSubtitle: ['', [Validators.required, Validators.maxLength(300)]],
@@ -114,7 +115,10 @@ export class Content implements OnInit {
 
       if (result.updateSiteContent.success) {
         this.success.set(true);
-        setTimeout(() => this.success.set(false), 3000);
+        // Navigate back to dashboard after 1 second
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1000);
       } else {
         this.error.set('A tartalom mentése nem sikerült');
       }

@@ -74,6 +74,18 @@
           </tbody>
         </table>
 
+        <!-- Load More Button -->
+        <div *ngIf="hasMore() && contactMessages().length > 0" class="load-more-container">
+          <button 
+            class="load-more-btn"
+            (click)="loadMore()"
+            [disabled]="loading()"
+          >
+            <span *ngIf="loading()" class="spinner-small"></span>
+            {{ loading() ? 'Betöltés...' : 'További üzenetek betöltése' }}
+          </button>
+        </div>
+
         <!-- Empty state -->
         <div *ngIf="contactMessages().length === 0" class="empty-state">
           <div class="empty-icon">📧</div>

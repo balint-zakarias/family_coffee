@@ -1,4 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -89,7 +90,7 @@ export class Cart {
     });
   }
 
-  constructor(private cartService: CartService, private fb: FormBuilder, private gql: Graphql) {
+  constructor(private cartService: CartService, private fb: FormBuilder, private gql: Graphql, private router: Router) {
     this.orderForm = this.fb.group({
       customerName: ['', [Validators.required, Validators.maxLength(160)]],
       customerEmail: ['', [Validators.email, Validators.required]],
@@ -238,6 +239,7 @@ export class Cart {
         createOrder(input: $input) {
           order {
             id
+            orderId
             customerName
             grandTotal
           }
@@ -262,17 +264,31 @@ export class Cart {
         grandTotal: this.total()
       };
 
-      await this.gql.mutate(MUTATION, { input: orderInput });
+      const result = await this.gql.mutate<{
+        createOrder: {
+          order: {
+            id: number;
+            orderId: string;
+            customerName: string;
+            grandTotal: number;
+          }
+        }
+      }>(MUTATION, { input: orderInput });
 
-      this.orderSuccess.set(true);
-      setTimeout(() => this.orderSuccess.set(false), 4000);
-      
+      console.log('Order created successfully:', result);
+
       // Clear cart and form
       this.items.set([]);
       this.orderForm.reset({ acceptedPolicy: false });
       
       // Update cart service to refresh header icon
       await this.cartService.refreshCount();
+      
+      // Navigate to success page with orderId
+      console.log('Navigating to order success with orderId:', result.createOrder.order.orderId);
+      this.router.navigate(['/order-success'], {
+        queryParams: { orderId: result.createOrder.order.orderId }
+      });
       
     } catch (e: any) {
       this.orderError.set(e?.message || 'Hiba történt a rendelés leadása során');

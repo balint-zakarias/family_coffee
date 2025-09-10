@@ -1,0 +1,197 @@
+.order-success {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f2ec 0%, #e8e3d3 100%);
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.success-icon {
+  margin-bottom: 2rem;
+  
+  .checkmark {
+    width: 80px;
+    height: 80px;
+    background: var(--brand);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0 auto;
+    animation: checkmark-bounce 0.6s ease-out;
+  }
+}
+
+.success-content {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  
+  h1 {
+    color: var(--brand);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+}
+
+.order-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--brand);
+  
+  .order-id {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text);
+    
+    strong {
+      color: var(--brand);
+      font-family: 'Courier New', monospace;
+    }
+  }
+}
+
+.success-message {
+  margin-bottom: 2rem;
+  
+  p {
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.next-steps {
+  text-align: left;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  
+  h3 {
+    color: var(--brand);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      padding: 0.5rem 0;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  
+  .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &.btn-primary {
+      background: var(--brand);
+      color: white;
+      
+      &:hover {
+        background: #155a1f;
+        transform: translateY(-2px);
+      }
+    }
+    
+    &.btn-secondary {
+      background: white;
+      color: var(--brand);
+      border: 2px solid var(--brand);
+      
+      &:hover {
+        background: var(--brand);
+        color: white;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+.contact-info {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1.5rem;
+  color: var(--muted);
+  
+  p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    
+    &:first-child {
+      font-weight: 500;
+      color: var(--text);
+    }
+  }
+}
+
+@keyframes checkmark-bounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .success-content {
+    padding: 2rem 1.5rem;
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    
+    .btn {
+      width: 100%;
+    }
+  }
+}

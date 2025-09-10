@@ -1,0 +1,50 @@
+<div class="order-success">
+  <div class="container">
+    
+    <!-- Success Icon -->
+    <div class="success-icon">
+      <div class="checkmark">✓</div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-content">
+      <h1>Köszönjük a rendelését!</h1>
+      
+      @if(orderId()){<div class="order-info">
+        <p class="order-id">Rendelés azonosító: <strong>#{{ orderId() }}</strong></p>
+      </div>}
+
+      <div class="success-message">
+        <p>Rendelését sikeresen leadta. Hamarosan felvesszük Önnel a kapcsolatot a részletekkel kapcsolatban.</p>
+        <p>A rendelés megerősítéséről és a szállítási információkról e-mailben értesítjük.</p>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="next-steps">
+        <h3>Mi történik ezután?</h3>
+        <ul>
+          <li>📧 E-mail megerősítést küldünk a megadott címre</li>
+          <li>📞 Munkatársunk felveszi Önnel a kapcsolatot</li>
+          <li>📦 Elkészítjük és kiszállítjuk rendelését</li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="navigateToShop()">
+          Tovább vásárolok
+        </button>
+        <button class="btn btn-secondary" (click)="navigateToHome()">
+          Vissza a főoldalra
+        </button>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <p>Kérdése van? Keressen minket bizalommal!</p>
+        <p>📧 info@familycoffee.hu | 📞 +36 1 234 5678</p>
+      </div>
+    </div>
+
+  </div>
+</div>

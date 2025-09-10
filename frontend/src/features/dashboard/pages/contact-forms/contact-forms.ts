@@ -27,6 +27,11 @@ export class ContactForms implements OnInit {
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   
+  // Pagination
+  currentPage = signal<number>(1);
+  pageSize = 20;
+  hasMore = signal<boolean>(true);
+  
   // Delete modal state
   showDeleteModal = signal<boolean>(false);
   messageToDelete = signal<ContactMessage | null>(null);
@@ -37,13 +42,15 @@ export class ContactForms implements OnInit {
     this.loadContactMessages();
   }
 
-  async loadContactMessages() {
+  async loadContactMessages(loadMore = false) {
     this.loading.set(true);
     this.error.set(null);
 
+    const offset = loadMore ? (this.currentPage() - 1) * this.pageSize : 0;
+
     const QUERY = /* GraphQL */ `
-      query GetContactMessages {
-        contactMessages {
+      query GetContactMessages($limit: Int, $offset: Int) {
+        contactMessages(limit: $limit, offset: $offset) {
           id
           name
           email
@@ -56,12 +63,32 @@ export class ContactForms implements OnInit {
     `;
 
     try {
-      const data = await this.gql.query<{ contactMessages: ContactMessage[] }>(QUERY);
-      this.contactMessages.set(data.contactMessages || []);
+      const variables = {
+        limit: this.pageSize,
+        offset: offset
+      };
+
+      const data = await this.gql.query<{ contactMessages: ContactMessage[] }>(QUERY, variables);
+      
+      if (loadMore) {
+        this.contactMessages.update(current => [...current, ...data.contactMessages]);
+      } else {
+        this.contactMessages.set(data.contactMessages || []);
+        this.currentPage.set(1);
+      }
+      
+      this.hasMore.set(data.contactMessages.length === this.pageSize);
     } catch (e: any) {
       this.error.set(e?.message || 'Hiba a kapcsolat üzenetek betöltése során');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  loadMore() {
+    if (this.hasMore() && !this.loading()) {
+      this.currentPage.update(page => page + 1);
+      this.loadContactMessages(true);
     }
   }
 

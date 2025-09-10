@@ -45,6 +45,11 @@ export class Orders implements OnInit {
   // Szűrők
   selectedStatus = signal<string | null>(null);
   
+  // Pagination
+  currentPage = signal<number>(1);
+  pageSize = 20;
+  hasMore = signal<boolean>(true);
+  
   // Modal állapot
   selectedOrder = signal<Order | null>(null);
   showModal = signal<boolean>(false);
@@ -55,13 +60,15 @@ export class Orders implements OnInit {
     this.loadOrders();
   }
 
-  async loadOrders() {
+  async loadOrders(loadMore = false) {
     this.loading.set(true);
     this.error.set(null);
 
+    const offset = loadMore ? (this.currentPage() - 1) * this.pageSize : 0;
+
     const QUERY = /* GraphQL */ `
-      query GetOrders($status: String) {
-        orders(status: $status) {
+      query GetOrders($status: String, $limit: Int, $offset: Int) {
+        orders(status: $status, limit: $limit, offset: $offset) {
           id
           orderId
           customerName
@@ -89,18 +96,35 @@ export class Orders implements OnInit {
     `;
 
     try {
-      const variables: any = {};
+      const variables: any = {
+        limit: this.pageSize,
+        offset: offset
+      };
       if (this.selectedStatus()) {
         variables.status = this.selectedStatus();
       }
 
       const data = await this.gql.query<{ orders: Order[] }>(QUERY, variables);
-      console.log('Orders data:', data.orders);
-      this.orders.set(data.orders || []);
+      
+      if (loadMore) {
+        this.orders.update(current => [...current, ...data.orders]);
+      } else {
+        this.orders.set(data.orders || []);
+        this.currentPage.set(1);
+      }
+      
+      this.hasMore.set(data.orders.length === this.pageSize);
     } catch (e: any) {
       this.error.set(e?.message || 'Hiba a rendelések betöltése során');
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  loadMore() {
+    if (this.hasMore() && !this.loading()) {
+      this.currentPage.update(page => page + 1);
+      this.loadOrders(true);
     }
   }
 

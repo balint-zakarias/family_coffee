@@ -52,10 +52,14 @@ class DeleteContactMessage(graphene.Mutation):
 
 
 class ContactQuery(graphene.ObjectType):
-    contact_messages = graphene.List(ContactMessageType)
+    contact_messages = graphene.List(
+        ContactMessageType,
+        limit=graphene.Int(),
+        offset=graphene.Int()
+    )
 
-    def resolve_contact_messages(self, info):
-        return ContactMessage.objects.all().order_by('-created_at')
+    def resolve_contact_messages(self, info, limit=20, offset=0):
+        return ContactMessage.objects.all().order_by('-created_at')[offset:offset + limit]
 
 
 class ContactMutation(graphene.ObjectType):

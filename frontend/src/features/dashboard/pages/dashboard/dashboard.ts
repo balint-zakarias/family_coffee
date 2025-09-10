@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIf, DecimalPipe } from '@angular/common';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
+import { DashboardActivity } from '../../components/dashboard-activity/dashboard-activity';
 import { Graphql } from '../../../../core/graphql.service';
 
 interface DashboardStats {
@@ -13,7 +14,7 @@ interface DashboardStats {
 @Component({
   selector: 'page-dashboard',
   standalone: true,
-  imports: [DashboardHeader, RouterLink, NgIf, DecimalPipe],
+  imports: [DashboardHeader, DashboardActivity, RouterLink, NgIf, DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
