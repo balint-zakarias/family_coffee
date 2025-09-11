@@ -18,7 +18,7 @@ def get_or_create_cart(request):
 
     if not cart:
         cart = Cart.objects.create(expires_at=timezone.now() + timedelta(days=CART_COOKIE_DAYS))
-        # jelöljük, hogy választ kell küldeni cookie-val
+        # Needs to set cookie in response
         request._set_cart_cookie_token = str(cart.token)
 
     return cart

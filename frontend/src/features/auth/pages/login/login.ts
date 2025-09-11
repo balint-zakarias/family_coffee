@@ -48,7 +48,6 @@ export class Login {
     this.error.set(null);
 
     try {
-      // Biztonságos logging - csak email, jelszó nélkül
       console.log('Bejelentkezési kísérlet:', { email: this.email().trim() });
 
       const response = await this.http.post<LoginResponse>(this.API_URL, {
@@ -56,7 +55,6 @@ export class Login {
         password: this.password().trim()
       }).toPromise();
 
-      // Ellenőrizzük a válasz sikerességét
       if (response && response.success === true && response.user) {
         console.log('Sikeres bejelentkezés:', {
           username: response.user.username,
@@ -64,14 +62,11 @@ export class Login {
           is_staff: response.user.is_staff
         });
         
-        // Felhasználói adatok mentése localStorage-ba
         localStorage.setItem('familycoffee_user', JSON.stringify(response.user));
         
-        // Átirányítás a dashboard-ra
         this.router.navigate(['/dashboard']);
         
       } else {
-        // Ha a response.success false vagy nincs user
         const errorMessage = response?.error || 'Bejelentkezési hiba történt';
         this.error.set(errorMessage);
         console.log('Bejelentkezés sikertelen:', errorMessage);

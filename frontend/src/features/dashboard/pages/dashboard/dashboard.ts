@@ -26,7 +26,6 @@ export class Dashboard implements OnInit {
   constructor(private router: Router, private gql: Graphql) {}
 
   ngOnInit() {
-    // Ellenőrizzük, hogy be van-e jelentkezve a felhasználó
     const userData = localStorage.getItem('familycoffee_user');
     if (!userData) {
       this.router.navigate(['/login']);
@@ -36,12 +35,10 @@ export class Dashboard implements OnInit {
     try {
       const user = JSON.parse(userData);
       if (!user.is_staff) {
-        // Ha nem staff felhasználó, átirányítás
         this.router.navigate(['/']);
         return;
       }
       
-      // Ha minden rendben, betöltjük a statisztikákat
       this.loadStats();
     } catch (e) {
       console.error('Error parsing user data:', e);

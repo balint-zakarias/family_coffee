@@ -67,14 +67,13 @@ class CartItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = [("cart", "product")]  # egy termék egyszer a kosárban
+        unique_together = [("cart", "product")]
 
     def recalc(self):
         self.line_total = (self.unit_price_snapshot or Decimal("0.00")) * self.quantity
 
     def save(self, *args, **kwargs):
         if not self.unit_price_snapshot:
-            # fallback – normál esetben mutáció állítja
             self.unit_price_snapshot = self.product.price
         self.recalc()
         return super().save(*args, **kwargs)

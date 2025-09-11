@@ -34,7 +34,6 @@ def _send_order_emails(order):
         )
 
         merchant_order_email = getattr(SiteSettings.objects.first(), "merchant_order_email", None)
-        print("##########################MERCHANT EMAIL IS: ", merchant_order_email)
         if merchant_order_email:
             send_mail(
                 subject=f"Új rendelés érkezett #{order.order_id}",

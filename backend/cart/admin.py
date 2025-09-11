@@ -42,11 +42,9 @@ class CartAdmin(admin.ModelAdmin):
         ("Időbélyegek", {"fields": ("created_at", "updated_at", "expires_at")}),
     )
 
-    # gyors aggregációk a listában (N+1 nélkül)
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        # line_total = (unit_price_snapshot OR product.price) * quantity
-        # ha nincs snapshot, a product.price-t használjuk
+
         line_total_expr = ExpressionWrapper(
             (F("items__unit_price_snapshot") + 0) * F("items__quantity"),
             output_field=DecimalField(max_digits=12, decimal_places=2),
@@ -66,7 +64,6 @@ class CartAdmin(admin.ModelAdmin):
     qty_sum.short_description = "Össz. mennyiség"
 
     def subtotal(self, obj):
-        # ha az annotate nem tudott számolni (pl. üres kosár), essen vissza kézi összegzésre
         if obj._subtotal is not None:
             return obj._subtotal
         total = Decimal("0.00")
@@ -76,7 +73,6 @@ class CartAdmin(admin.ModelAdmin):
         return total
     subtotal.short_description = "Részösszeg (Ft)"
 
-    # read-only mezők a szerkesztő nézetben
     def display_subtotal(self, obj): return self.subtotal(obj)
     display_subtotal.short_description = "Részösszeg (Ft)"
 

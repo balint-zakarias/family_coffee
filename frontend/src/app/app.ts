@@ -24,8 +24,6 @@ export class App {
   ) { 
     this.cart.loadCountOnce();
     
-    // Router inicializálás után definiáljuk az observable-t
-    // Header/footer elrejtése login és dashboard oldalakon
     this.showHeaderFooter$ = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map((event: NavigationEnd) => 
