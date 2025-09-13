@@ -18,6 +18,7 @@ interface Order {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  customerTaxId: string;
   billingAddress: string;
   billingCity: string;
   billingZip: string;
@@ -72,6 +73,7 @@ export class Orders implements OnInit {
           id
           orderId
           customerName
+          customerTaxId
           customerEmail
           customerPhone
           billingAddress

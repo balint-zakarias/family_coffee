@@ -15,6 +15,7 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=160)
     customer_email = models.EmailField(blank=True, null=True)
     customer_phone = models.CharField(max_length=50)
+    customer_tax_id = models.CharField(max_length=50, blank=True, null=True)
     billing_address = models.CharField(max_length=300, blank=True, null=True)
     billing_city = models.CharField(max_length=120, blank=True, null=True)
     billing_zip = models.CharField(max_length=20, blank=True, null=True)

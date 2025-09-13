@@ -75,7 +75,7 @@ class OrderType(DjangoObjectType):
     class Meta:
         model = Order
         fields = (
-            "id", "order_id", "customer_name", "customer_email", "customer_phone",
+            "id", "order_id", "customer_name", "customer_email", "customer_phone", "customer_tax_id",
             "shipping_address", "shipping_city", "shipping_zip", "delivery_notes",
             "subtotal", "grand_total", "status", "created_at", "updated_at", "items",
             "billing_address", "billing_city", "billing_zip", "different_delivery_address"
@@ -91,6 +91,7 @@ class OrderInput(graphene.InputObjectType):
     customer_name = graphene.String(required=True)
     customer_email = graphene.String(required=False)
     customer_phone = graphene.String(required=True)
+    customer_tax_id = graphene.String(required=False)
     billing_address = graphene.String(required=True)
     billing_city = graphene.String(required=True)
     billing_zip = graphene.String(required=True)
@@ -125,6 +126,7 @@ class CreateOrder(graphene.Mutation):
                 customer_name=input.customer_name,
                 customer_email=input.customer_email,
                 customer_phone=input.customer_phone,
+                customer_tax_id=input.customer_tax_id,
                 billing_address=input.billing_address,
                 billing_city=input.billing_city,
                 billing_zip=input.billing_zip,
