@@ -179,6 +179,30 @@
             formControlName="deliveryNotes"
           ></textarea>
         </div>
+        <section class="shipping-info">
+          <div class="shipping-card">
+            <div class="shipping-header">
+              <div class="shipping-icon">🚚</div>
+              <h4>Szállítási információk</h4>
+            </div>
+            <div class="shipping-options">
+              <div class="shipping-option free">
+                <div class="option-icon">✓</div>
+                <div class="option-content">
+                  <div class="option-title">Ingyenes kiszállítás</div>
+                  <div class="option-desc">Baranya, Somogy és Tolna vármegyében</div>
+                </div>
+              </div>
+              <div class="shipping-option courier">
+                <div class="option-icon">📦</div>
+                <div class="option-content">
+                  <div class="option-title">Futárszolgálat</div>
+                  <div class="option-desc">Más területekre egyedi díjszabással (súlytól és mérettől függően), melyet a rendelés leadását követően egyeztetünk</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
 
 
@@ -192,7 +216,7 @@
             type="checkbox" 
             formControlName="acceptedPolicy"
           />
-          Elfogadom az <a href="/privacy" target="_blank">Adatvédelmi Nyilatkozatot</a> *
+          Elfogadom az<a href="/privacy" target="_blank">Adatvédelmi Nyilatkozatot</a>és tudomásul veszem a szállítási információkat.
         </label>
         <div class="submit-wrap">
           <button 

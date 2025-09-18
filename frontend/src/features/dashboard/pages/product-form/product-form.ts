@@ -4,18 +4,7 @@ import { NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DashboardHeader } from '@shared/ui/dashboard-header/dashboard-header';
 import { Graphql } from '../../../../core/graphql.service';
-
-interface Product {
-  id?: number;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string | null;
-  categoryId: number | null;
-  sku: string;
-  stockQty: number;
-  isActive: boolean;
-}
+import { Product } from '../../../../core/models';
 
 interface Category {
   id: number;
@@ -37,13 +26,17 @@ export class ProductForm implements OnInit {
   error = signal<string | null>(null);
   categories = signal<Category[]>([]);
 
-  product = signal<Product>({
+  product = signal<Partial<Product>>({
     name: '',
     description: '',
     price: 0,
     imageUrl: null,
-    categoryId: null,
+    category: null,
     sku: '',
+    ean: '',
+    eanCarton: '',
+    neta: 0,
+    vat: 27.00,
     stockQty: 0,
     isActive: true
   });
@@ -101,8 +94,12 @@ export class ProductForm implements OnInit {
           description
           price
           imageUrl
-          category { id }
+          category { id name }
           sku
+          ean
+          eanCarton
+          neta
+          vat
           stockQty
           isActive
         }
@@ -116,10 +113,14 @@ export class ProductForm implements OnInit {
           id: data.product.id,
           name: data.product.name,
           description: data.product.description || '',
-          price: Math.round(data.product.price), // Egész számra kerekítés
+          price: Math.round(data.product.price),
           imageUrl: data.product.imageUrl,
-          categoryId: data.product.category?.id || null,
+          category: data.product.category,
           sku: data.product.sku,
+          ean: data.product.ean || '',
+          eanCarton: data.product.eanCarton || '',
+          neta: data.product.neta || 0,
+          vat: data.product.vat || 27.00,
           stockQty: data.product.stockQty,
           isActive: data.product.isActive
         });
@@ -178,16 +179,19 @@ export class ProductForm implements OnInit {
       description: this.product().description,
       price: this.product().price,
       sku: this.product().sku,
+      ean: this.product().ean,
+      eanCarton: this.product().eanCarton,
+      neta: this.product().neta,
+      vat: this.product().vat,
       stockQty: this.product().stockQty,
       isActive: this.product().isActive,
-      categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
+      categoryId: this.product().category ? parseInt(this.product().category!.id.toString()) : null
     };
 
-    const variables: any = { input };
     if (this.selectedFile) {
       await this.gql.mutateMultipart(MUTATION, { input, image: this.selectedFile });
     } else {
-      await this.gql.mutate(MUTATION, variables);
+      await this.gql.mutate(MUTATION, { input });
     }
   }
 
@@ -196,27 +200,28 @@ export class ProductForm implements OnInit {
       mutation UpdateProduct($input: ProductInput!, $image: Upload) {
         updateProduct(input: $input, image: $image) { id }
       }
-    `
+    `;
 
     const input = {
       id: this.product().id,
       name: this.product().name,
       description: this.product().description,
-      price: parseFloat(this.product().price?.toString()),
+      price: parseFloat(this.product().price?.toString() || '0'),
       sku: this.product().sku,
+      ean: this.product().ean,
+      eanCarton: this.product().eanCarton,
+      neta: parseFloat(this.product().neta?.toString() || '0'),
+      vat: parseFloat(this.product().vat?.toString() || '27'),
       stockQty: this.product().stockQty,
       isActive: this.product().isActive,
-      categoryId: this.product().categoryId ? parseInt(this.product().categoryId!.toString()) : null
+      categoryId: this.product().category ? parseInt(this.product().category!.id.toString()) : null
     };
 
-    const variables: any = { input };
     if (this.selectedFile) {
       await this.gql.mutateMultipart(MUTATION, { input, image: this.selectedFile });
     } else {
       await this.gql.mutate(MUTATION, { input });
     }
-
-    await this.gql.mutate(MUTATION, variables);
   }
 
   onCancel() {
@@ -240,7 +245,6 @@ export class ProductForm implements OnInit {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      // Preview
       const reader = new FileReader();
       reader.onload = (e) => {
         this.product.update(p => ({ ...p, imageUrl: e.target?.result as string }));

@@ -28,6 +28,15 @@ class Product(models.Model):
         Category, on_delete=models.SET_NULL, null=True, related_name="products"
     )
     sku = models.CharField(max_length=64, unique=True)
+    ean = models.CharField(max_length=64, blank=True)
+    ean_carton = models.CharField(max_length=64, blank=True, default="")
+    neta = models.DecimalField(max_digits=10, default=0, decimal_places=2)
+    vat = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=27.00,
+        help_text="VAT percentage (e.g., enter 27 for 27%)",
+    )
     stock_qty = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 

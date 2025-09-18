@@ -343,6 +343,106 @@
         }
       }
 
+      .shipping-info {
+        margin: 24px 0;
+        
+        .shipping-card {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 24px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          
+          .shipping-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            
+            .shipping-icon {
+              font-size: 24px;
+              background: rgba(255, 255, 255, 0.15);
+              width: 48px;
+              height: 48px;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            
+            h4 {
+              margin: 0;
+              font-family: 'Lexend', system-ui, sans-serif;
+              font-weight: 600;
+              font-size: 20px;
+              color: #fff;
+            }
+          }
+          
+          .shipping-options {
+            display: grid;
+            gap: 16px;
+            
+            .shipping-option {
+              display: flex;
+              align-items: flex-start;
+              gap: 16px;
+              padding: 16px;
+              background: rgba(255, 255, 255, 0.08);
+              border-radius: 12px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              transition: all 0.2s ease;
+              
+              &:hover {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(255, 255, 255, 0.2);
+              }
+              
+              .option-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: 600;
+                flex-shrink: 0;
+              }
+              
+              .option-content {
+                flex: 1;
+                
+                .option-title {
+                  font-family: 'Lexend', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 16px;
+                  color: #fff;
+                  margin-bottom: 4px;
+                }
+                
+                .option-desc {
+                  font-family: 'Lexend', system-ui, sans-serif;
+                  font-size: 14px;
+                  color: rgba(255, 255, 255, 0.8);
+                  line-height: 1.4;
+                }
+              }
+              
+              &.free .option-icon {
+                background: #28a745;
+                color: #fff;
+              }
+              
+              &.courier .option-icon {
+                background: #ffc107;
+                color: #000;
+              }
+            }
+          }
+        }
+      }
+
       .success-animation {
         text-align: center;
         padding: 40px 20px;
@@ -414,16 +514,104 @@
         }
       }
 
-      .error-message {
-        background: #f8d7da;
-        color: #721c24;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #f5c6cb;
-        margin-bottom: 1rem;
-        font-family: 'Lexend', system-ui, sans-serif;
-        font-weight: 600;
-        animation: slideIn 0.3s ease-out;
+      .shipping-info {
+        margin: 24px 0;
+        
+        .shipping-card {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 24px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          
+          .shipping-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            
+            .shipping-icon {
+              font-size: 24px;
+              background: rgba(255, 255, 255, 0.15);
+              width: 48px;
+              height: 48px;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            
+            h4 {
+              margin: 0;
+              font-family: 'Lexend', system-ui, sans-serif;
+              font-weight: 600;
+              font-size: 20px;
+              color: #fff;
+            }
+          }
+          
+          .shipping-options {
+            display: grid;
+            gap: 16px;
+            
+            .shipping-option {
+              display: flex;
+              align-items: flex-start;
+              gap: 16px;
+              padding: 16px;
+              background: rgba(255, 255, 255, 0.08);
+              border-radius: 12px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              transition: all 0.2s ease;
+              
+              &:hover {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(255, 255, 255, 0.2);
+              }
+              
+              .option-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                font-weight: 600;
+                flex-shrink: 0;
+              }
+              
+              .option-content {
+                flex: 1;
+                
+                .option-title {
+                  font-family: 'Lexend', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 16px;
+                  color: #fff;
+                  margin-bottom: 4px;
+                }
+                
+                .option-desc {
+                  font-family: 'Lexend', system-ui, sans-serif;
+                  font-size: 14px;
+                  color: rgba(255, 255, 255, 0.8);
+                  line-height: 1.4;
+                }
+              }
+              
+              &.free .option-icon {
+                background: #28a745;
+                color: #fff;
+              }
+              
+              &.courier .option-icon {
+                background: #ffc107;
+                color: #000;
+              }
+            }
+          }
+        }
       }
 
       .input.error,

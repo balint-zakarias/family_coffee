@@ -64,6 +64,30 @@
             />
           </div>
 
+          <div class="form-group">
+            <label for="ean" class="form-label">EAN kód</label>
+            <input
+              type="text"
+              id="ean"
+              class="form-input"
+              [(ngModel)]="product().ean"
+              name="ean"
+              [readonly]="isReadonly"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="eanCarton" class="form-label">Karton EAN</label>
+            <input
+              type="text"
+              id="eanCarton"
+              class="form-input"
+              [(ngModel)]="product().eanCarton"
+              name="eanCarton"
+              [readonly]="isReadonly"
+            />
+          </div>
+
           <div class="form-group full-width">
             <label for="description" class="form-label">Leírás</label>
             <textarea
@@ -88,8 +112,36 @@
               [readonly]="isReadonly"
               min="0"
               step="1"
-              step="1"
               required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="neta" class="form-label">Neta (HUF)</label>
+            <input
+              type="number"
+              id="neta"
+              class="form-input"
+              [(ngModel)]="product().neta"
+              name="neta"
+              [readonly]="isReadonly"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="vat" class="form-label">ÁFA (%)</label>
+            <input
+              type="number"
+              id="vat"
+              class="form-input"
+              [(ngModel)]="product().vat"
+              name="vat"
+              [readonly]="isReadonly"
+              min="0"
+              max="100"
+              step="0.01"
             />
           </div>
 
@@ -114,14 +166,14 @@
             <select
               id="category"
               class="form-select"
-              [(ngModel)]="product().categoryId"
-              name="categoryId"
+              [(ngModel)]="product().category"
+              name="category"
               [disabled]="isReadonly"
             >
-              <option [value]="null">Válasszon kategóriát</option>
+              <option [ngValue]="null">Válasszon kategóriát</option>
               <option 
                 *ngFor="let category of categories()" 
-                [value]="category.id"
+                [ngValue]="category"
               >
                 {{ category.name }}
               </option>

@@ -19,6 +19,10 @@ class ProductInput(graphene.InputObjectType):
     image_url = graphene.String()  # URL alternatíva
     category_id = graphene.Int()
     sku = graphene.String()
+    ean = graphene.String()
+    ean_carton = graphene.String()
+    neta = graphene.Float()
+    vat = graphene.Float()
     stock_qty = graphene.Int()
     is_active = graphene.Boolean()
 
@@ -50,6 +54,10 @@ class ProductType(DjangoObjectType):
             "image_url",
             "category",
             "sku",
+            "ean",
+            "ean_carton",
+            "neta",
+            "vat",
             "stock_qty",
             "is_active",
             "created_at",
@@ -141,6 +149,10 @@ class CreateProduct(graphene.Mutation):
             'description': input.description or '',
             'price': input.price,
             'sku': input.sku or '',
+            'ean': input.ean or '',
+            'ean_carton': input.ean_carton or '',
+            'neta': input.neta or 0,
+            'vat': input.vat or 27.00,
             'stock_qty': input.stock_qty or 0,
             'is_active': input.is_active if input.is_active is not None else True,
         }
@@ -183,6 +195,10 @@ class UpdateProduct(graphene.Mutation):
             product.description = input.description or ''
             product.price = input.price
             product.sku = input.sku or ''
+            product.ean = input.ean or ''
+            product.ean_carton = input.ean_carton or ''
+            product.neta = input.neta or 0
+            product.vat = input.vat or 27.00
             product.stock_qty = input.stock_qty or 0
             product.is_active = input.is_active if input.is_active is not None else True
             
