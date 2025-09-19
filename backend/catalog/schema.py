@@ -25,6 +25,7 @@ class ProductInput(graphene.InputObjectType):
     vat = graphene.Float()
     stock_qty = graphene.Int()
     is_active = graphene.Boolean()
+    only_for_rent = graphene.Boolean()
 
 class CategoryType(DjangoObjectType):
     class Meta:
@@ -60,6 +61,7 @@ class ProductType(DjangoObjectType):
             "vat",
             "stock_qty",
             "is_active",
+            "only_for_rent",
             "created_at",
             "updated_at",
             "images",
@@ -155,6 +157,7 @@ class CreateProduct(graphene.Mutation):
             'vat': input.vat or 27.00,
             'stock_qty': input.stock_qty or 0,
             'is_active': input.is_active if input.is_active is not None else True,
+            'only_for_rent': input.only_for_rent if input.only_for_rent is not None else False,
         }
         
         if input.category_id:
@@ -201,6 +204,7 @@ class UpdateProduct(graphene.Mutation):
             product.vat = input.vat or 27.00
             product.stock_qty = input.stock_qty or 0
             product.is_active = input.is_active if input.is_active is not None else True
+            product.only_for_rent = input.only_for_rent if input.only_for_rent is not None else False
             
             if input.category_id:
                 product.category_id = input.category_id

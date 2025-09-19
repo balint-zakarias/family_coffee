@@ -18,6 +18,7 @@ interface ProductDetail {
   sku: string;
   stockQty: number;
   isActive: boolean;
+  onlyForRent: boolean;
 }
 
 @Component({
@@ -68,6 +69,7 @@ export class Product implements OnInit {
           sku
           stockQty
           isActive
+          onlyForRent
         }
       }
     `;

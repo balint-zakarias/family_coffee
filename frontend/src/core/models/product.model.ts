@@ -19,6 +19,7 @@ export interface Product {
   vat: number;
   stockQty: number;
   isActive: boolean;
+  onlyForRent: boolean;
   createdAt: string;
   updatedAt: string;
   images: ProductImage[];

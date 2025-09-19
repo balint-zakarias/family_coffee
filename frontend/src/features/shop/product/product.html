@@ -44,7 +44,8 @@
         <div class="product-info-section">
           <div class="product-header">
             <h1 class="product-title">{{ product()?.name }}</h1>
-            <div class="product-price">{{ product()?.price | number:'1.0-0' }} Ft</div>
+            @if(product()?.onlyForRent) {<div class="rental-indicator">Csak bérelhető</div>}
+            <div class="product-price">{{ product()?.price | number:'1.0-0' }} Ft{{ product()?.onlyForRent ? ' / hó' : '' }}</div>
           </div>
 
           <div class="product-meta">

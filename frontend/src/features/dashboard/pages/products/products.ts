@@ -20,6 +20,7 @@ interface Product {
   sku: string;
   stockQty: number;
   isActive: boolean;
+  onlyForRent: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,7 +43,7 @@ export class Products implements OnInit {
   categories = signal<Category[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
-  
+
   // Szűrők
   selectedCategoryId = signal<number | null>(null);
   searchTerm = signal<string>('');
@@ -117,6 +118,7 @@ export class Products implements OnInit {
           sku
           stockQty
           isActive
+          onlyForRent
           createdAt
           updatedAt
         }
@@ -128,15 +130,15 @@ export class Products implements OnInit {
         limit: this.pageSize,
         offset: offset
       };
-      
+
       if (this.selectedCategoryId()) {
         variables.categoryId = this.selectedCategoryId();
       }
-      
+
       if (this.searchTerm().trim()) {
         variables.search = this.searchTerm().trim();
       }
-      
+
       if (this.showInactiveProducts()) {
         variables.isActive = null; // Show all products
       } else {
@@ -144,16 +146,16 @@ export class Products implements OnInit {
       }
 
       const data = await this.gql.query<{ products: Product[] }>(QUERY, variables);
-      
+
       if (loadMore) {
         this.products.update(current => [...current, ...data.products]);
       } else {
         this.products.set(data.products || []);
         this.currentPage.set(1);
       }
-      
+
       this.hasMore.set(data.products.length === this.pageSize);
-      
+
     } catch (e: any) {
       console.error('Error loading products:', e);
       this.error.set(e?.message || 'Hiba a termékek betöltése során');
@@ -169,9 +171,9 @@ export class Products implements OnInit {
         // Scroll to the load more button after content loads
         setTimeout(() => {
           if (this.loadMoreBtn) {
-            this.loadMoreBtn.nativeElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center' 
+            this.loadMoreBtn.nativeElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
             });
           }
         }, 100);
@@ -276,7 +278,7 @@ export class Products implements OnInit {
       `;
 
       const result = await this.gql.mutate<{ deleteProduct: { success: boolean; deactivated: boolean } }>(
-        MUTATION, 
+        MUTATION,
         { slug: product.slug }
       );
 
@@ -303,8 +305,8 @@ export class Products implements OnInit {
   get deleteModalMessage(): string {
     const product = this.productToDelete();
     if (!product) return '';
-    
-    return product.isActive 
+
+    return product.isActive
       ? `Biztosan inaktiválni szeretné a "${product.name}" terméket?\n\nAz inaktív termék nem jelenik meg a webshopban, de később újra aktiválható.`
       : `Biztosan véglegesen törölni szeretné a "${product.name}" terméket?\n\nEz a művelet nem vonható vissza!`;
   }

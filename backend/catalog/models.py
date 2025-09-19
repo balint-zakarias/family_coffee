@@ -39,6 +39,7 @@ class Product(models.Model):
     )
     stock_qty = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    only_for_rent = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

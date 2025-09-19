@@ -62,6 +62,7 @@ export class List implements OnInit {
           description
           price
           imageUrl
+          onlyForRent
         }
       }
     `;

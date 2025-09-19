@@ -6,7 +6,7 @@
   <div class="info">
     <h3 class="title">{{ product.name }}</h3>
     <p class="muted" *ngIf="product.description as d">{{ d }}</p>
-    <p class="price">{{ product.price | number:'1.0-0' }} Ft</p>
+    <p class="price">{{ product.price | number:'1.0-0' }} Ft{{ product.onlyForRent ? ' / hó' : '' }}</p>
 
     <div class="actions">
       <div class="cart-wrapper" [class.show-success]="showSuccess">

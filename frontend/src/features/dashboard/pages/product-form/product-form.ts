@@ -38,7 +38,8 @@ export class ProductForm implements OnInit {
     neta: 0,
     vat: 27.00,
     stockQty: 0,
-    isActive: true
+    isActive: true,
+    onlyForRent: false
   });
 
   selectedFile: File | null = null;
@@ -102,6 +103,7 @@ export class ProductForm implements OnInit {
           vat
           stockQty
           isActive
+          onlyForRent
         }
       }
     `;
@@ -122,7 +124,8 @@ export class ProductForm implements OnInit {
           neta: data.product.neta || 0,
           vat: data.product.vat || 27.00,
           stockQty: data.product.stockQty,
-          isActive: data.product.isActive
+          isActive: data.product.isActive,
+          onlyForRent: data.product.onlyForRent || false
         });
       }
     } catch (e: any) {
@@ -185,6 +188,7 @@ export class ProductForm implements OnInit {
       vat: this.product().vat,
       stockQty: this.product().stockQty,
       isActive: this.product().isActive,
+      onlyForRent: this.product().onlyForRent,
       categoryId: this.product().category ? parseInt(this.product().category!.id.toString()) : null
     };
 
@@ -214,6 +218,7 @@ export class ProductForm implements OnInit {
       vat: parseFloat(this.product().vat?.toString() || '27'),
       stockQty: this.product().stockQty,
       isActive: this.product().isActive,
+      onlyForRent: this.product().onlyForRent,
       categoryId: this.product().category ? parseInt(this.product().category!.id.toString()) : null
     };
 

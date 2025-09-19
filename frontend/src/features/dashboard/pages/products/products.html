@@ -2,7 +2,7 @@
 
 <main class="products-main">
   <div class="products-container">
-    
+
     <!-- Page header -->
     <section class="page-header">
       <div class="header-content">
@@ -32,8 +32,8 @@
               [value]="searchTerm()"
               (input)="onSearchChange($any($event.target).value)"
             />
-            @if(searchTerm()){<button 
-              class="clear-btn" 
+            @if(searchTerm()){<button
+              class="clear-btn"
               (click)="clearSearch()"
               type="button"
             >
@@ -52,7 +52,7 @@
             (change)="onCategoryChange($any($event.target).value)"
           >
             <option value="">Minden kategória</option>
-            @for(category of categories(); track category.id){<option 
+            @for(category of categories(); track category.id){<option
               [value]="category.id"
             >
               {{ category.name }}
@@ -103,11 +103,9 @@
               <th>Kép</th>
               <th>Termék</th>
               <th>Kategória</th>
-              <th>Cikkszám</th>
               <th>Ár</th>
               <th>Készlet</th>
               <th>Státusz</th>
-              <th>Létrehozva</th>
               <th>Műveletek</th>
             </tr>
           </thead>
@@ -115,8 +113,8 @@
             @for(product of products(); track trackByProductId($index, product)){<tr class="product-row">
               <!-- Product image -->
               <td class="product-image-cell">
-                <img 
-                  [src]="getProductImageUrl(product)" 
+                <img
+                  [src]="getProductImageUrl(product)"
                   [alt]="product.name"
                   class="product-image"
                   loading="lazy"
@@ -141,14 +139,9 @@
                 </span>}
               </td>
 
-              <!-- SKU -->
-              <td class="sku-cell">
-                <code class="sku-code">{{ product.sku }}</code>
-              </td>
-
               <!-- Price -->
               <td class="price-cell">
-                <span class="price">{{ product.price | number:'1.0-0' }} Ft</span>
+                <span class="price">{{ product.price | number:'1.0-0' }} Ft{{ product.onlyForRent ? ' / hó' : '' }}</span>
               </td>
 
               <!-- Stock -->
@@ -166,11 +159,6 @@
                 </span>
               </td>
 
-              <!-- Created date -->
-              <td class="date-cell">
-                {{ product.createdAt | date:'yyyy.MM.dd' }}
-              </td>
-
               <!-- Actions -->
               <td class="actions-cell">
                 <div class="action-buttons">
@@ -180,9 +168,9 @@
                   <button type="button" class="action-btn view" title="Megtekintés" (click)="navigateToView(product)">
                     👁️
                   </button>
-                  <button 
-                    type="button" 
-                    class="action-btn delete" 
+                  <button
+                    type="button"
+                    class="action-btn delete"
                     [title]="product.isActive ? 'Inaktiválás' : 'Törlés'"
                     (click)="deleteProduct(product)"
                   >
@@ -193,10 +181,10 @@
             </tr>}
           </tbody>
         </table>
-        
+
         <!-- Load More Button -->
         @if(hasMore() && products().length > 0){<div class="load-more-container">
-          <button 
+          <button
             #loadMoreBtn
             class="load-more-btn"
             (click)="loadMore()"

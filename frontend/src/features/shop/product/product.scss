@@ -129,6 +129,20 @@
     }
   }
 
+  .rental-indicator {
+    display: inline-block;
+    background: #8B4513;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Lexend', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   .product-price {
     font-family: 'Lexend', system-ui, sans-serif;
     font-size: 2rem;
