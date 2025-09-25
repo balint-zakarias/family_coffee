@@ -6,7 +6,10 @@
     "start": "ng serve --proxy-config proxy.conf.json --port 4200",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:integration": "ng test --watch=false --browsers=ChromeHeadless",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
   },
   "prettier": {
     "printWidth": 100,
@@ -30,6 +33,7 @@
     "@angular/material": "^20.2.1",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "@playwright/test": "^1.55.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

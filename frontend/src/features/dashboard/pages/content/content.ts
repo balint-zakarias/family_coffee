@@ -9,8 +9,11 @@ interface SiteContent {
   id: string;
   heroTitle: string;
   heroSubtitle: string;
+  heroImageUrl: string | null;
   aboutTitle: string;
   aboutBody: string;
+  aboutImageUrl: string | null;
+  webshopImageUrl: string | null;
 }
 
 @Component({
@@ -26,6 +29,14 @@ export class Content implements OnInit {
   saving = signal<boolean>(false);
   success = signal<boolean>(false);
   error = signal<string | null>(null);
+
+  // Image files and preview URLs
+  heroImageFile: File | null = null;
+  aboutImageFile: File | null = null;
+  webshopImageFile: File | null = null;
+  heroImagePreview: string | null = null;
+  aboutImagePreview: string | null = null;
+  webshopImagePreview: string | null = null;
 
   constructor(private fb: FormBuilder, private gql: Graphql, private router: Router) {
     this.contentForm = this.fb.group({
@@ -50,8 +61,11 @@ export class Content implements OnInit {
           id
           heroTitle
           heroSubtitle
+          heroImageUrl
           aboutTitle
           aboutBody
+          aboutImageUrl
+          webshopImageUrl
         }
       }
     `;
@@ -65,6 +79,11 @@ export class Content implements OnInit {
           aboutTitle: data.siteContent.aboutTitle || '',
           aboutBody: data.siteContent.aboutBody || ''
         });
+        
+        // Set image previews
+        this.heroImagePreview = data.siteContent.heroImageUrl;
+        this.aboutImagePreview = data.siteContent.aboutImageUrl;
+        this.webshopImagePreview = data.siteContent.webshopImageUrl;
       }
     } catch (e: any) {
       this.error.set(e?.message || 'Hiba a tartalom betöltése során');
@@ -85,15 +104,18 @@ export class Content implements OnInit {
     this.saving.set(true);
 
     const MUTATION = /* GraphQL */ `
-      mutation UpdateSiteContent($heroTitle: String, $heroSubtitle: String, $aboutTitle: String, $aboutBody: String) {
-        updateSiteContent(heroTitle: $heroTitle, heroSubtitle: $heroSubtitle, aboutTitle: $aboutTitle, aboutBody: $aboutBody) {
+      mutation UpdateSiteContent($heroTitle: String, $heroSubtitle: String, $aboutTitle: String, $aboutBody: String, $heroImage: Upload, $aboutImage: Upload, $webshopImage: Upload) {
+        updateSiteContent(heroTitle: $heroTitle, heroSubtitle: $heroSubtitle, aboutTitle: $aboutTitle, aboutBody: $aboutBody, heroImage: $heroImage, aboutImage: $aboutImage, webshopImage: $webshopImage) {
           success
           siteContent {
             id
             heroTitle
             heroSubtitle
+            heroImageUrl
             aboutTitle
             aboutBody
+            aboutImageUrl
+            webshopImageUrl
           }
         }
       }
@@ -101,17 +123,26 @@ export class Content implements OnInit {
 
     try {
       const formData = this.contentForm.value;
-      const result = await this.gql.mutate<{ 
-        updateSiteContent: { 
-          success: boolean; 
-          siteContent: SiteContent 
-        } 
-      }>(MUTATION, {
+      const variables: any = {
         heroTitle: formData.heroTitle,
         heroSubtitle: formData.heroSubtitle,
         aboutTitle: formData.aboutTitle,
         aboutBody: formData.aboutBody
-      });
+      };
+
+      // Add image files if present
+      if (this.heroImageFile) variables.heroImage = this.heroImageFile;
+      if (this.aboutImageFile) variables.aboutImage = this.aboutImageFile;
+      if (this.webshopImageFile) variables.webshopImage = this.webshopImageFile;
+
+      const result = await (this.heroImageFile || this.aboutImageFile || this.webshopImageFile 
+        ? this.gql.mutateMultipart(MUTATION, variables)
+        : this.gql.mutate(MUTATION, variables)) as { 
+        updateSiteContent: { 
+          success: boolean; 
+          siteContent: SiteContent 
+        } 
+      };
 
       if (result.updateSiteContent.success) {
         this.success.set(true);
@@ -132,5 +163,45 @@ export class Content implements OnInit {
 
   get canSubmit(): boolean {
     return this.contentForm.valid && !this.saving();
+  }
+
+  onHeroImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.heroImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.heroImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onAboutImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.aboutImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.aboutImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onWebshopImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.webshopImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.webshopImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onImageError(event: any) {
+    event.target.style.display = 'none';
   }
 }

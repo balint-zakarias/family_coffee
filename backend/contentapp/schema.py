@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from graphene_file_upload.scalars import Upload
 
 from .models import SiteContent, SiteSettings
 
@@ -53,17 +54,29 @@ class UpdateSiteContent(graphene.Mutation):
         hero_subtitle = graphene.String()
         about_title = graphene.String()
         about_body = graphene.String()
+        hero_image = Upload()
+        about_image = Upload()
+        webshop_image = Upload()
 
     site_content = graphene.Field(SiteContentType)
     success = graphene.Boolean()
 
-    def mutate(self, info, **kwargs):
+    def mutate(self, info, hero_image=None, about_image=None, webshop_image=None, **kwargs):
         try:
             site_content, created = SiteContent.objects.get_or_create(id=1)
             
+            # Update text fields
             for field, value in kwargs.items():
                 if value is not None:
                     setattr(site_content, field, value)
+            
+            # Update image fields
+            if hero_image is not None:
+                site_content.hero_image = hero_image
+            if about_image is not None:
+                site_content.about_image = about_image
+            if webshop_image is not None:
+                site_content.webshop_image = webshop_image
             
             site_content.save()
             return UpdateSiteContent(site_content=site_content, success=True)

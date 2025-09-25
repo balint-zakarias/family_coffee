@@ -14,11 +14,21 @@ export class Header {
   
   readonly brand = signal({ family: '/assets/family_coffee_logo_transparent.png', nestle: '/assets/nestle.png'});
   readonly cartIcon = signal('/assets/cart.png');
+  readonly mobileMenuOpen = signal(false);
+  
   private cart = inject(CartService);
   cartCount = this.cart.count;
 
   ngOnInit() {
     this.cart.loadCountOnce();
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.set(!this.mobileMenuOpen());
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen.set(false);
   }
 
   scrollToSection(sectionId: string) {

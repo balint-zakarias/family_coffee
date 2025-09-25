@@ -1,4 +1,4 @@
-<section class="hero" [ngStyle]="bgStyle()">
+<section class="hero" [style.backgroundImage]="imageUrl ? 'url(' + imageUrl + ')' : null">
     <div class="hero__inner">
       <div class="hero__left">
         <h1 class="hero__title">{{ title }}</h1>

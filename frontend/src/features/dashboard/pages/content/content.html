@@ -66,6 +66,29 @@
                 </span>
               </div>
             </div>
+
+            <div class="form-group">
+              <label for="heroImageFile" class="form-label">Hero kép feltöltése</label>
+              <input
+                type="file"
+                id="heroImageFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onHeroImageSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="heroImagePreview">
+              <label class="form-label">Hero kép előnézet</label>
+              <div class="image-preview">
+                <img 
+                  [src]="heroImagePreview" 
+                  alt="Hero kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
           </div>
 
           <!-- About Section -->
@@ -113,6 +136,57 @@
                 <span *ngIf="contentForm.get('aboutBody')?.errors?.['maxlength']">
                   A szöveg maximum 2000 karakter lehet.
                 </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="aboutImageFile" class="form-label">Rólunk kép feltöltése</label>
+              <input
+                type="file"
+                id="aboutImageFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onAboutImageSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="aboutImagePreview">
+              <label class="form-label">Rólunk kép előnézet</label>
+              <div class="image-preview">
+                <img 
+                  [src]="aboutImagePreview" 
+                  alt="Rólunk kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Webshop Section -->
+          <div class="form-section-group">
+            <h2>Webshop szekció</h2>
+            
+            <div class="form-group">
+              <label for="webshopImageFile" class="form-label">Webshop kép feltöltése</label>
+              <input
+                type="file"
+                id="webshopImageFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onWebshopImageSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="webshopImagePreview">
+              <label class="form-label">Webshop kép előnézet</label>
+              <div class="image-preview">
+                <img 
+                  [src]="webshopImagePreview" 
+                  alt="Webshop kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
               </div>
             </div>
           </div>

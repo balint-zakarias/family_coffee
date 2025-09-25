@@ -1,10 +1,10 @@
 $header-height: 80px;
 
 .hero {
-  background-image: var(--hero-bg), linear-gradient(135deg, #296100 0%, #204108 100%);
-  background-size: cover, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
+  background: linear-gradient(135deg, #296100 0%, #204108 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   color: #fff;
   width: 100%;
@@ -60,9 +60,65 @@ $header-height: 80px;
 
 /* Mobilon egymás alatt legyen */
 @media (max-width: 900px) {
+  .hero {
+    height: calc(80vh - #{$header-height});
+    min-height: 380px;
+    background-position: center center;
+  }
+  
   .hero__inner {
     grid-template-columns: 1fr;
+    padding-inline: 20px;
+    text-align: center;
+  }
+  
+  .hero__left { 
+    max-width: 100%;
+    padding: 20px 0;
+  }
+  
+  .hero__title {
+    font-size: clamp(24px, 6vw, 42px);
+    margin-bottom: 12px;
+  }
+  
+  .hero__subtitle {
+    font-size: clamp(14px, 3.5vw, 18px);
+    margin-bottom: 20px;
+  }
+  
+  .hero__btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: calc(70vh - #{$header-height});
+    min-height: 320px;
+  }
+  
+  .hero__inner {
     padding-inline: 16px;
   }
-  .hero__left { max-width: 100%; }
+  
+  .hero__left {
+    padding: 16px 0;
+  }
+  
+  .hero__title {
+    font-size: clamp(20px, 7vw, 32px);
+    margin-bottom: 10px;
+  }
+  
+  .hero__subtitle {
+    font-size: clamp(13px, 4vw, 16px);
+    margin-bottom: 16px;
+  }
+  
+  .hero__btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }

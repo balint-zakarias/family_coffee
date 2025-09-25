@@ -6,23 +6,30 @@
       <img class="brand__nestle" [src]="brand().nestle" alt="Nestlé">
     </a>
 
-    <nav class="nav" aria-label="Fő navigáció">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Főoldal</a>
-      <a (click)="scrollToSection('about')" routerLinkActive="active">Rólunk</a>
-      <a (click)="scrollToSection('contact')" routerLink="/contact" routerLinkActive="active">Kapcsolat</a>
-      <a routerLink="/shop" routerLinkActive="active">Webshop</a>
+    <nav class="nav" [class.nav--open]="mobileMenuOpen()" aria-label="Fő navigáció">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMobileMenu()">Főoldal</a>
+      <a (click)="scrollToSection('about'); closeMobileMenu()" routerLinkActive="active">Rólunk</a>
+      <a (click)="scrollToSection('contact'); closeMobileMenu()" routerLink="/contact" routerLinkActive="active">Kapcsolat</a>
+      <a routerLink="/shop" routerLinkActive="active" (click)="closeMobileMenu()">Webshop</a>
     </nav>
 
-    <a class="cart" routerLink="/cart" aria-label="Kosár">
-      <img class="cart__icon" [src]="cartIcon()" alt="" aria-hidden="true">
-    
-      <ng-container *ngIf="cartCount() as c">
-        <span class="cart__badge" *ngIf="c > 0">
-          {{ c > 99 ? '99+' : c }}
-        </span>
-        <!-- Polite refresh -->
-        <span class="sr-only" aria-live="polite">{{ c }} tétel a kosárban</span>
-      </ng-container>
-    </a>
+    <div class="mobile-actions">
+      <button class="hamburger" [class.hamburger--open]="mobileMenuOpen()" (click)="toggleMobileMenu()" aria-label="Menü">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <a class="cart" routerLink="/cart" aria-label="Kosár">
+        <img class="cart__icon" [src]="cartIcon()" alt="" aria-hidden="true">
+      
+        <ng-container *ngIf="cartCount() as c">
+          <span class="cart__badge" *ngIf="c > 0">
+            {{ c > 99 ? '99+' : c }}
+          </span>
+          <span class="sr-only" aria-live="polite">{{ c }} tétel a kosárban</span>
+        </ng-container>
+      </a>
+    </div>
   </div>
 </header>

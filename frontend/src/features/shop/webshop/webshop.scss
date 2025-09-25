@@ -17,3 +17,27 @@ $header-height: 80px;
   margin: 0 auto;
   padding: 32px 16px 64px;
 }
+
+/* Mobile optimizations */
+@media (max-width: 900px) {
+  .shop-hero {
+    height: calc(60vh - #{$header-height});
+    min-height: 300px;
+    background-position: center center;
+  }
+  
+  .list-wrap {
+    padding: 24px 12px 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-hero {
+    height: calc(50vh - #{$header-height});
+    min-height: 250px;
+  }
+  
+  .list-wrap {
+    padding: 20px 8px 40px;
+  }
+}
