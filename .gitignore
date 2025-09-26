@@ -8,6 +8,10 @@ backend/venv/
 __pycache__/
 *.pyc
 
+# Environment variables
+backend/.env
+.env
+
 # Media files (uploaded content)
 backend/config/media/
 
