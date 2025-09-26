@@ -1,4 +1,5 @@
-import { signal, Component } from '@angular/core';
+import { signal, Component, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Hero } from './hero/hero';
 import { PopularProducts } from './popular-products/popular-products';
 import { Contact } from './contact/contact';
@@ -11,6 +12,7 @@ type SiteContent = {
   heroButtonText: string | null;
   heroButtonUrl: string | null;
   heroImageUrl: string | null;
+  heroImageMobile: string | null;
   aboutTitle: string | null;
   aboutSubtitle: string | null;
   aboutImageUrl: string | null;
@@ -34,12 +36,14 @@ type Product = {
   imports: [Hero, PopularProducts, About, Contact]
 })
 export class Home {
+  private platformId = inject(PLATFORM_ID);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
   popularProducts = signal<Product[]>([]);
 
   heroImageUrl = signal<string | null>(null);
+  heroImageUrlMobile = signal<string | null>(null);
   title = signal<string | null>(null);
   subtitle = signal<string | null>(null);
   ctaText = signal<string | null>(null);
@@ -48,6 +52,18 @@ export class Home {
   aboutSubtitle = signal<string | null>(null);
   aboutImageUrl = signal<string | null>(null);
   aboutBody = signal<string | null>(null);
+
+  // Computed property to get the appropriate hero image based on screen size
+  currentHeroImage = computed(() => {
+    if (!isPlatformBrowser(this.platformId)) {
+      return this.heroImageUrl();
+    }
+    
+    const isMobile = window.innerWidth <= 768;
+    return isMobile && this.heroImageUrlMobile() 
+      ? this.heroImageUrlMobile() 
+      : this.heroImageUrl();
+  });
 
   constructor(private gql: Graphql) {
     this.load();
@@ -74,6 +90,7 @@ export class Home {
           heroButtonText
           heroButtonUrl
           heroImageUrl
+          heroImageMobile
           aboutTitle
           aboutSubtitle
           aboutImageUrl
@@ -97,6 +114,7 @@ export class Home {
         if (sc.aboutBody) this.aboutBody.set(sc.aboutBody);
 
         if (sc.heroImageUrl) this.heroImageUrl.set(this.normalizeUrl(sc.heroImageUrl));
+        if (sc.heroImageMobile) this.heroImageUrlMobile.set(this.normalizeUrl(sc.heroImageMobile));
         if (sc.aboutImageUrl) this.aboutImageUrl.set(this.normalizeUrl(sc.aboutImageUrl));
       }
     } catch (e: any) {

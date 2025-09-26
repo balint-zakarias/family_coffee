@@ -68,7 +68,45 @@
             </div>
 
             <div class="form-group">
-              <label for="heroImageFile" class="form-label">Hero kép feltöltése</label>
+              <label for="heroButtonText" class="form-label">
+                Gomb szövege
+              </label>
+              <input
+                id="heroButtonText"
+                type="text"
+                class="form-input"
+                formControlName="heroButtonText"
+                placeholder="Böngészés"
+                [class.error]="contentForm.get('heroButtonText')?.invalid && contentForm.get('heroButtonText')?.touched"
+              />
+              <div *ngIf="contentForm.get('heroButtonText')?.invalid && contentForm.get('heroButtonText')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('heroButtonText')?.errors?.['maxlength']">
+                  A gomb szövege maximum 60 karakter lehet.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="heroButtonUrl" class="form-label">
+                Gomb URL
+              </label>
+              <input
+                id="heroButtonUrl"
+                type="text"
+                class="form-input"
+                formControlName="heroButtonUrl"
+                placeholder="/products"
+                [class.error]="contentForm.get('heroButtonUrl')?.invalid && contentForm.get('heroButtonUrl')?.touched"
+              />
+              <div *ngIf="contentForm.get('heroButtonUrl')?.invalid && contentForm.get('heroButtonUrl')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('heroButtonUrl')?.errors?.['maxlength']">
+                  A gomb URL maximum 200 karakter lehet.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="heroImageFile" class="form-label">Hero kép feltöltése (Desktop)</label>
               <input
                 type="file"
                 id="heroImageFile"
@@ -79,11 +117,34 @@
             </div>
 
             <div class="form-group" *ngIf="heroImagePreview">
-              <label class="form-label">Hero kép előnézet</label>
+              <label class="form-label">Hero kép előnézet (Desktop)</label>
               <div class="image-preview">
                 <img 
                   [src]="heroImagePreview" 
                   alt="Hero kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="heroImageMobileFile" class="form-label">Hero kép feltöltése (Mobil)</label>
+              <input
+                type="file"
+                id="heroImageMobileFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onHeroImageMobileSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="heroImageMobilePreview">
+              <label class="form-label">Hero kép előnézet (Mobil)</label>
+              <div class="image-preview">
+                <img 
+                  [src]="heroImageMobilePreview" 
+                  alt="Hero kép mobil"
                   class="preview-image"
                   (error)="onImageError($event)"
                 />
@@ -118,6 +179,25 @@
             </div>
 
             <div class="form-group">
+              <label for="aboutSubtitle" class="form-label">
+                Szekció alcíme
+              </label>
+              <input
+                id="aboutSubtitle"
+                type="text"
+                class="form-input"
+                formControlName="aboutSubtitle"
+                placeholder="Családi vállalkozás"
+                [class.error]="contentForm.get('aboutSubtitle')?.invalid && contentForm.get('aboutSubtitle')?.touched"
+              />
+              <div *ngIf="contentForm.get('aboutSubtitle')?.invalid && contentForm.get('aboutSubtitle')?.touched" class="form-error">
+                <span *ngIf="contentForm.get('aboutSubtitle')?.errors?.['maxlength']">
+                  Az alcím maximum 240 karakter lehet.
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
               <label for="aboutBody" class="form-label">
                 Szekció szövege *
               </label>
@@ -140,7 +220,7 @@
             </div>
 
             <div class="form-group">
-              <label for="aboutImageFile" class="form-label">Rólunk kép feltöltése</label>
+              <label for="aboutImageFile" class="form-label">Rólunk kép feltöltése (Desktop)</label>
               <input
                 type="file"
                 id="aboutImageFile"
@@ -151,11 +231,34 @@
             </div>
 
             <div class="form-group" *ngIf="aboutImagePreview">
-              <label class="form-label">Rólunk kép előnézet</label>
+              <label class="form-label">Rólunk kép előnézet (Desktop)</label>
               <div class="image-preview">
                 <img 
                   [src]="aboutImagePreview" 
                   alt="Rólunk kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="aboutImageMobileFile" class="form-label">Rólunk kép feltöltése (Mobil)</label>
+              <input
+                type="file"
+                id="aboutImageMobileFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onAboutImageMobileSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="aboutImageMobilePreview">
+              <label class="form-label">Rólunk kép előnézet (Mobil)</label>
+              <div class="image-preview">
+                <img 
+                  [src]="aboutImageMobilePreview" 
+                  alt="Rólunk kép mobil"
                   class="preview-image"
                   (error)="onImageError($event)"
                 />
@@ -168,7 +271,7 @@
             <h2>Webshop szekció</h2>
             
             <div class="form-group">
-              <label for="webshopImageFile" class="form-label">Webshop kép feltöltése</label>
+              <label for="webshopImageFile" class="form-label">Webshop kép feltöltése (Desktop)</label>
               <input
                 type="file"
                 id="webshopImageFile"
@@ -179,11 +282,34 @@
             </div>
 
             <div class="form-group" *ngIf="webshopImagePreview">
-              <label class="form-label">Webshop kép előnézet</label>
+              <label class="form-label">Webshop kép előnézet (Desktop)</label>
               <div class="image-preview">
                 <img 
                   [src]="webshopImagePreview" 
                   alt="Webshop kép"
+                  class="preview-image"
+                  (error)="onImageError($event)"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="webshopImageMobileFile" class="form-label">Webshop kép feltöltése (Mobil)</label>
+              <input
+                type="file"
+                id="webshopImageMobileFile"
+                class="form-input"
+                accept="image/*"
+                (change)="onWebshopImageMobileSelected($event)"
+              />
+            </div>
+
+            <div class="form-group" *ngIf="webshopImageMobilePreview">
+              <label class="form-label">Webshop kép előnézet (Mobil)</label>
+              <div class="image-preview">
+                <img 
+                  [src]="webshopImageMobilePreview" 
+                  alt="Webshop kép mobil"
                   class="preview-image"
                   (error)="onImageError($event)"
                 />

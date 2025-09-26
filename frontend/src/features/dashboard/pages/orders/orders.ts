@@ -45,6 +45,7 @@ export class Orders implements OnInit {
   
   // Szűrők
   selectedStatus = signal<string | null>(null);
+  searchQuery = signal<string>('');
   
   // Pagination
   currentPage = signal<number>(1);
@@ -68,8 +69,8 @@ export class Orders implements OnInit {
     const offset = loadMore ? (this.currentPage() - 1) * this.pageSize : 0;
 
     const QUERY = /* GraphQL */ `
-      query GetOrders($status: String, $limit: Int, $offset: Int) {
-        orders(status: $status, limit: $limit, offset: $offset) {
+      query GetOrders($status: String, $search: String, $limit: Int, $offset: Int) {
+        orders(status: $status, search: $search, limit: $limit, offset: $offset) {
           id
           orderId
           customerName
@@ -105,6 +106,9 @@ export class Orders implements OnInit {
       if (this.selectedStatus()) {
         variables.status = this.selectedStatus();
       }
+      if (this.searchQuery()) {
+        variables.search = this.searchQuery();
+      }
 
       const data = await this.gql.query<{ orders: Order[] }>(QUERY, variables);
       
@@ -133,6 +137,17 @@ export class Orders implements OnInit {
   onStatusFilterChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.selectedStatus.set(target.value || null);
+    this.loadOrders();
+  }
+
+  onSearchChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery.set(target.value);
+    this.loadOrders();
+  }
+
+  clearSearch() {
+    this.searchQuery.set('');
     this.loadOrders();
   }
 

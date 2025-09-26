@@ -4,6 +4,7 @@ from django.db import models
 class SiteContent(models.Model):
     # Hero
     hero_image = models.ImageField(upload_to="site/", blank=True, null=True)
+    hero_image_mobile = models.ImageField(upload_to="site/", blank=True, null=True)
     hero_title = models.CharField(max_length=120, blank=True, default="")
     hero_subtitle = models.CharField(max_length=240, blank=True, default="")
     hero_button_text = models.CharField(max_length=60, blank=True, default="")
@@ -11,11 +12,13 @@ class SiteContent(models.Model):
 
     # About us
     about_image = models.ImageField(upload_to="site/", blank=True, null=True)
+    about_image_mobile = models.ImageField(upload_to="site/", blank=True, null=True)
     about_title = models.CharField(max_length=120, blank=True, default="")
     about_subtitle = models.CharField(max_length=240, blank=True, default="")
     about_body = models.TextField(blank=True, default="")
 
     webshop_image = models.ImageField(upload_to="site/", blank=True, null=True)
+    webshop_image_mobile = models.ImageField(upload_to="site/", blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

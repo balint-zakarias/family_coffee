@@ -1,6 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf } from '@angular/common'; 
+import { NgIf } from '@angular/common';
 import { CartService } from 'core/cart.service';
 
 @Component({
@@ -11,11 +11,11 @@ import { CartService } from 'core/cart.service';
   styleUrls: ['./header.scss']
 })
 export class Header {
-  
-  readonly brand = signal({ family: '/assets/family_coffee_logo_transparent.png', nestle: '/assets/nestle.png'});
+
+  readonly brand = signal({ family: '/assets/family_coffee_logo_transparent.png', nestle: '/assets/nestle.webp' });
   readonly cartIcon = signal('/assets/cart.png');
   readonly mobileMenuOpen = signal(false);
-  
+
   private cart = inject(CartService);
   cartCount = this.cart.count;
 

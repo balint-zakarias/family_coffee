@@ -1,8 +1,6 @@
 <!-- Page Header -->
-<app-dashboard-header 
-  title="Rendelések" 
-  subtitle="Beérkezett rendelések kezelése és nyomon követése"
-></app-dashboard-header>
+<app-dashboard-header title="Rendelések"
+  subtitle="Beérkezett rendelések kezelése és nyomon követése"></app-dashboard-header>
 
 <main class="orders-main">
   <div class="orders-container">
@@ -10,6 +8,16 @@
     <!-- Filters -->
     <section class="filters-section">
       <div class="filters-grid">
+        <div class="filter-group">
+          <label class="filter-label">Keresés</label>
+          <div class="search-input-container">
+            <input type="text" class="search-input" placeholder="Rendelés azonosító, név, email vagy telefon..."
+              [value]="searchQuery()" (input)="onSearchChange($event)" />
+            @if(searchQuery()){<button class="clear-search-btn" (click)="clearSearch()" type="button">
+              ×
+            </button>}
+          </div>
+        </div>
         <div class="filter-group">
           <label class="filter-label">Státusz szűrés</label>
           <select class="filter-select" (change)="onStatusFilterChange($event)">
@@ -118,11 +126,7 @@
 
         <!-- Load More Button -->
         @if(hasMore() && orders().length > 0){<div class="load-more-container">
-          <button 
-            class="load-more-btn"
-            (click)="loadMore()"
-            [disabled]="loading()"
-          >
+          <button class="load-more-btn" (click)="loadMore()" [disabled]="loading()">
             @if(loading()){<span class="spinner-small"></span>}
             {{ loading() ? 'Betöltés...' : 'További rendelések betöltése' }}
           </button>
@@ -147,7 +151,7 @@
       <h2>Rendelés részletei - #{{ selectedOrder()!.orderId }}</h2>
       <button class="modal-close" (click)="closeModal()">×</button>
     </div>
-    
+
     <div class="modal-body">
       <!-- Customer Info -->
       <section class="info-section">
@@ -226,12 +230,9 @@
         <div class="summary-grid">
           <div class="summary-item">
             <label>Státusz módosítása:</label>
-            <select 
-              class="status-select"
-              [value]="selectedOrder()!.status.toLowerCase()"
+            <select class="status-select" [value]="selectedOrder()!.status.toLowerCase()"
               (change)="updateOrderStatus(selectedOrder()!.orderId, $any($event.target).value)"
-              [ngClass]="getStatusClass(selectedOrder()!.status)"
-            >
+              [ngClass]="getStatusClass(selectedOrder()!.status)">
               <option value="placed">Leadva</option>
               <option value="delivered">Kiszállítva</option>
               <option value="canceled">Törölve</option>

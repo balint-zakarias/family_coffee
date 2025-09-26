@@ -129,6 +129,23 @@
             padding-top: 20px;
             border-top: 1px solid #eee;
         }
+
+        .product-extra {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.4;
+        }
+
+        .product-extra div {
+            margin-bottom: 2px;
+        }
+
+        .product-extra .extra-label {
+            font-weight: 600;
+            color: #296100;
+            margin-right: 4px;
+        }
     </style>
 </head>
 
@@ -195,22 +212,27 @@
                 <div class="product-item">
                     <div>
                         <div class="product-name">{{ item.name_snapshot }}</div>
-                        {{ item.quantity }} db × {{ item.unit_price_snapshot|floatformat:0|intcomma }} Ft
+                        <div class="product-details">
+                            {{ item.quantity }} db × {{ item.unit_price_snapshot|floatformat:0|intcomma }} Ft
+                        </div>
+                        <div class="product-extra">
+                            <div><span class="extra-label">SKU:</span> {{ item.product.sku }}</div>
+                            <div><span class="extra-label">EAN:</span> {{ item.product.ean }}</div>
+                            <div><span class="extra-label">EAN (karton):</span> {{ item.product.ean_carton }}</div>
+                            <div><span class="extra-label">NETA:</span> {{ item.product.neta }}</div>
+                            <div><span class="extra-label">ÁFA:</span> {{ item.product.vat }}%</div>
+                            <div><span class="extra-label">Készlet:</span> {{ item.product.stock_qty }} db</div>
+                        </div>
                     </div>
-                    <div class="product-price"> {{ item.line_total|floatformat:0|intcomma }} Ft</div>
+                    <div class="product-price">
+                        {{ item.line_total|floatformat:0|intcomma }} Ft
+                    </div>
                 </div>
                 {% endfor %}
             </div>
 
             <div class="total">
                 <p class="total-amount">Összesen: {{ order.grand_total|floatformat:0|intcomma }} Ft</p>
-            </div>
-
-            <div class="contact-info">
-                <p><strong>Kérdése van?</strong></p>
-                <p>Keressen minket bizalommal az alábbi elérhetőségeken:</p>
-                <p>📧 IDE BE KELL MAJD ÌRNI AZ EMAILT<br>📞 TELEFONSZAM</p>
-                <p>Hamarosan felvesszük Önnel a kapcsolatot a rendelés részleteivel kapcsolatban.</p>
             </div>
         </div>
 

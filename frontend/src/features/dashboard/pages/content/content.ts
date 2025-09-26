@@ -9,11 +9,17 @@ interface SiteContent {
   id: string;
   heroTitle: string;
   heroSubtitle: string;
+  heroButtonText: string;
+  heroButtonUrl: string;
   heroImageUrl: string | null;
+  heroImageUrlMobile: string | null;
   aboutTitle: string;
+  aboutSubtitle: string;
   aboutBody: string;
   aboutImageUrl: string | null;
+  aboutImageUrlMobile: string | null;
   webshopImageUrl: string | null;
+  webshopImageUrlMobile: string | null;
 }
 
 @Component({
@@ -32,17 +38,26 @@ export class Content implements OnInit {
 
   // Image files and preview URLs
   heroImageFile: File | null = null;
+  heroImageMobileFile: File | null = null;
   aboutImageFile: File | null = null;
+  aboutImageMobileFile: File | null = null;
   webshopImageFile: File | null = null;
+  webshopImageMobileFile: File | null = null;
   heroImagePreview: string | null = null;
+  heroImageMobilePreview: string | null = null;
   aboutImagePreview: string | null = null;
+  aboutImageMobilePreview: string | null = null;
   webshopImagePreview: string | null = null;
+  webshopImageMobilePreview: string | null = null;
 
   constructor(private fb: FormBuilder, private gql: Graphql, private router: Router) {
     this.contentForm = this.fb.group({
       heroTitle: ['', [Validators.required, Validators.maxLength(200)]],
       heroSubtitle: ['', [Validators.required, Validators.maxLength(300)]],
+      heroButtonText: ['', [Validators.maxLength(60)]],
+      heroButtonUrl: ['', [Validators.maxLength(200)]],
       aboutTitle: ['', [Validators.required, Validators.maxLength(200)]],
+      aboutSubtitle: ['', [Validators.maxLength(240)]],
       aboutBody: ['', [Validators.required, Validators.maxLength(2000)]]
     });
   }
@@ -61,11 +76,17 @@ export class Content implements OnInit {
           id
           heroTitle
           heroSubtitle
+          heroButtonText
+          heroButtonUrl
           heroImageUrl
+          heroImageUrlMobile
           aboutTitle
+          aboutSubtitle
           aboutBody
           aboutImageUrl
+          aboutImageUrlMobile
           webshopImageUrl
+          webshopImageUrlMobile
         }
       }
     `;
@@ -76,14 +97,20 @@ export class Content implements OnInit {
         this.contentForm.patchValue({
           heroTitle: data.siteContent.heroTitle || '',
           heroSubtitle: data.siteContent.heroSubtitle || '',
+          heroButtonText: data.siteContent.heroButtonText || '',
+          heroButtonUrl: data.siteContent.heroButtonUrl || '',
           aboutTitle: data.siteContent.aboutTitle || '',
+          aboutSubtitle: data.siteContent.aboutSubtitle || '',
           aboutBody: data.siteContent.aboutBody || ''
         });
         
         // Set image previews
         this.heroImagePreview = data.siteContent.heroImageUrl;
+        this.heroImageMobilePreview = data.siteContent.heroImageUrlMobile;
         this.aboutImagePreview = data.siteContent.aboutImageUrl;
+        this.aboutImageMobilePreview = data.siteContent.aboutImageUrlMobile;
         this.webshopImagePreview = data.siteContent.webshopImageUrl;
+        this.webshopImageMobilePreview = data.siteContent.webshopImageUrlMobile;
       }
     } catch (e: any) {
       this.error.set(e?.message || 'Hiba a tartalom betöltése során');
@@ -104,18 +131,24 @@ export class Content implements OnInit {
     this.saving.set(true);
 
     const MUTATION = /* GraphQL */ `
-      mutation UpdateSiteContent($heroTitle: String, $heroSubtitle: String, $aboutTitle: String, $aboutBody: String, $heroImage: Upload, $aboutImage: Upload, $webshopImage: Upload) {
-        updateSiteContent(heroTitle: $heroTitle, heroSubtitle: $heroSubtitle, aboutTitle: $aboutTitle, aboutBody: $aboutBody, heroImage: $heroImage, aboutImage: $aboutImage, webshopImage: $webshopImage) {
+      mutation UpdateSiteContent($heroTitle: String, $heroSubtitle: String, $heroButtonText: String, $heroButtonUrl: String, $aboutTitle: String, $aboutSubtitle: String, $aboutBody: String, $heroImage: Upload, $heroImageMobile: Upload, $aboutImage: Upload, $aboutImageMobile: Upload, $webshopImage: Upload, $webshopImageMobile: Upload) {
+        updateSiteContent(heroTitle: $heroTitle, heroSubtitle: $heroSubtitle, heroButtonText: $heroButtonText, heroButtonUrl: $heroButtonUrl, aboutTitle: $aboutTitle, aboutSubtitle: $aboutSubtitle, aboutBody: $aboutBody, heroImage: $heroImage, heroImageMobile: $heroImageMobile, aboutImage: $aboutImage, aboutImageMobile: $aboutImageMobile, webshopImage: $webshopImage, webshopImageMobile: $webshopImageMobile) {
           success
           siteContent {
             id
             heroTitle
             heroSubtitle
+            heroButtonText
+            heroButtonUrl
             heroImageUrl
+            heroImageUrlMobile
             aboutTitle
+            aboutSubtitle
             aboutBody
             aboutImageUrl
+            aboutImageUrlMobile
             webshopImageUrl
+            webshopImageUrlMobile
           }
         }
       }
@@ -126,16 +159,22 @@ export class Content implements OnInit {
       const variables: any = {
         heroTitle: formData.heroTitle,
         heroSubtitle: formData.heroSubtitle,
+        heroButtonText: formData.heroButtonText,
+        heroButtonUrl: formData.heroButtonUrl,
         aboutTitle: formData.aboutTitle,
+        aboutSubtitle: formData.aboutSubtitle,
         aboutBody: formData.aboutBody
       };
 
       // Add image files if present
       if (this.heroImageFile) variables.heroImage = this.heroImageFile;
+      if (this.heroImageMobileFile) variables.heroImageMobile = this.heroImageMobileFile;
       if (this.aboutImageFile) variables.aboutImage = this.aboutImageFile;
+      if (this.aboutImageMobileFile) variables.aboutImageMobile = this.aboutImageMobileFile;
       if (this.webshopImageFile) variables.webshopImage = this.webshopImageFile;
+      if (this.webshopImageMobileFile) variables.webshopImageMobile = this.webshopImageMobileFile;
 
-      const result = await (this.heroImageFile || this.aboutImageFile || this.webshopImageFile 
+      const result = await (this.heroImageFile || this.heroImageMobileFile || this.aboutImageFile || this.aboutImageMobileFile || this.webshopImageFile || this.webshopImageMobileFile 
         ? this.gql.mutateMultipart(MUTATION, variables)
         : this.gql.mutate(MUTATION, variables)) as { 
         updateSiteContent: { 
@@ -177,6 +216,18 @@ export class Content implements OnInit {
     }
   }
 
+  onHeroImageMobileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.heroImageMobileFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.heroImageMobilePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   onAboutImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -189,6 +240,18 @@ export class Content implements OnInit {
     }
   }
 
+  onAboutImageMobileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.aboutImageMobileFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.aboutImageMobilePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   onWebshopImageSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -196,6 +259,18 @@ export class Content implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.webshopImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onWebshopImageMobileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.webshopImageMobileFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.webshopImageMobilePreview = e.target?.result as string;
       };
       reader.readAsDataURL(file);
     }

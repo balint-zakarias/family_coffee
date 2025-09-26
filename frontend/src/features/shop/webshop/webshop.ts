@@ -1,10 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { List } from '../list/list';
 import { Graphql } from '../../../core/graphql.service';
 
 
 type SiteContent = {
   webshopImageUrl: string | null;
+  webshopImageMobile: string | null;
 };
 
 @Component({
@@ -15,10 +17,24 @@ type SiteContent = {
   styleUrls: ['./webshop.scss'],
 })
 export class Webshop {
+  private platformId = inject(PLATFORM_ID);
   loading = signal<boolean>(true);
   error   = signal<string | null>(null);
 
   heroImage = signal<string | null>(null);
+  heroImageMobile = signal<string | null>(null);
+
+  // Computed property to get the appropriate hero image based on screen size
+  currentHeroImage = computed(() => {
+    if (!isPlatformBrowser(this.platformId)) {
+      return this.heroImage();
+    }
+    
+    const isMobile = window.innerWidth <= 768;
+    return isMobile && this.heroImageMobile() 
+      ? this.heroImageMobile() 
+      : this.heroImage();
+  });
 
   // csak a markuphoz – később GraphQL-ből
   readonly categories = ['Szemes kávé', 'Oldódó kávé', 'Kakaó italok', 'Tejporok', 'Egyéb italok', 'Kiegészítők'];
@@ -44,14 +60,17 @@ export class Webshop {
       query WebshopSiteContent {
         siteContent {
           webshopImageUrl
+          webshopImageMobile
         }
       }
     `;
 
     try {
       const data = await this.gql.query<{ siteContent: SiteContent | null }>(QUERY);
-      const url = data.siteContent?.webshopImageUrl ?? null;
-      this.heroImage.set(this.normalize(url));
+      if (data.siteContent) {
+        this.heroImage.set(this.normalize(data.siteContent.webshopImageUrl));
+        this.heroImageMobile.set(this.normalize(data.siteContent.webshopImageMobile));
+      }
     } catch (e: any) {
       this.error.set(String(e?.message || e));
     } finally {

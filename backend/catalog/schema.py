@@ -9,6 +9,7 @@ from django.utils.text import slugify
 from .models import Category, Product, ProductImage
 from orders.models import Order
 
+
 class ProductInput(graphene.InputObjectType):
     id = graphene.ID()
     name = graphene.String(required=True)
@@ -26,6 +27,7 @@ class ProductInput(graphene.InputObjectType):
     stock_qty = graphene.Int()
     is_active = graphene.Boolean()
     only_for_rent = graphene.Boolean()
+
 
 class CategoryType(DjangoObjectType):
     class Meta:
@@ -71,7 +73,7 @@ class ProductType(DjangoObjectType):
         if self.image:
             return info.context.build_absolute_uri(self.image.url)
         return None
-    
+
     def resolve_category_slug(self, info):
         if self.category:
             return self.category.slug
@@ -94,45 +96,64 @@ class CatalogQuery(graphene.ObjectType):
     def resolve_categories(self, info):
         return Category.objects.all().order_by("name")
 
-    def resolve_products(self, info, category_slug=None, category_id=None, search=None, limit=12, offset=0, is_active=True):
-        queryset = Product.objects.all().select_related("category").prefetch_related("images")
+    def resolve_products(
+        self,
+        info,
+        category_slug=None,
+        category_id=None,
+        search=None,
+        limit=12,
+        offset=0,
+        is_active=True,
+    ):
+        queryset = (
+            Product.objects.all().select_related("category").prefetch_related("images")
+        )
 
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active)
-        
+
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
         if category_id:
-            queryset = queryset.filter(category__id=category_id)    
-        
+            queryset = queryset.filter(category__id=category_id)
+
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search) | Q(description__icontains=search)
             )
-        
+
         queryset = queryset.order_by("name")
-        return queryset[offset:offset + limit]
+        return queryset[offset : offset + limit]
 
     def resolve_product(self, info, slug):
         try:
-            return Product.objects.select_related("category").prefetch_related("images").get(slug=slug)
+            return (
+                Product.objects.select_related("category")
+                .prefetch_related("images")
+                .get(slug=slug)
+            )
         except Product.DoesNotExist:
             return None
-        
+
+
 class PopularProductsQuery(graphene.ObjectType):
     popular_products = graphene.List(
-        ProductType,
-        limit=graphene.Int(required=False, default_value=3)
+        ProductType, limit=graphene.Int(required=False, default_value=3)
     )
 
     def resolve_popular_products(self, info, limit):
-        pp = Product.objects.filter(order_items__order__status=(Order.Status.DELIVERED or Order.Status.PLACED)).annotate(total_sold=Sum("order_items__quantity")).order_by("-total_sold")[:limit]
+        pp = (
+            Product.objects.filter(
+                order_items__order__status=(
+                    Order.Status.DELIVERED or Order.Status.PLACED
+                )
+            )
+            .annotate(total_sold=Sum("order_items__quantity"))
+            .order_by("-total_sold")[:limit]
+        )
 
-        print("Resolving popular products with limit:", limit)
-        print("Popular products:", pp)
-        return (
-            pp
-        )        
+        return pp
 
 
 class CreateProduct(graphene.Mutation):
@@ -146,30 +167,32 @@ class CreateProduct(graphene.Mutation):
     def mutate(cls, root, info, input, image=None):
         # Create product
         product_data = {
-            'name': input.name,
-            'slug': slugify(input.name),
-            'description': input.description or '',
-            'price': input.price,
-            'sku': input.sku or '',
-            'ean': input.ean or '',
-            'ean_carton': input.ean_carton or '',
-            'neta': input.neta or 0,
-            'vat': input.vat or 27.00,
-            'stock_qty': input.stock_qty or 0,
-            'is_active': input.is_active if input.is_active is not None else True,
-            'only_for_rent': input.only_for_rent if input.only_for_rent is not None else False,
+            "name": input.name,
+            "slug": slugify(input.name),
+            "description": input.description or "",
+            "price": input.price,
+            "sku": input.sku or "",
+            "ean": input.ean or "",
+            "ean_carton": input.ean_carton or "",
+            "neta": input.neta or 0,
+            "vat": input.vat or 27.00,
+            "stock_qty": input.stock_qty or 0,
+            "is_active": input.is_active if input.is_active is not None else True,
+            "only_for_rent": input.only_for_rent
+            if input.only_for_rent is not None
+            else False,
         }
-        
+
         if input.category_id:
-            product_data['category_id'] = input.category_id
-            
+            product_data["category_id"] = input.category_id
+
         product = Product.objects.create(**product_data)
-        
+
         # Handle image upload after creation
         if image is not None:
             product.image = image
-            
-        product.save()    
+
+        product.save()
         return CreateProduct(product=product)
 
 
@@ -192,30 +215,32 @@ class UpdateProduct(graphene.Mutation):
             print("New image details:", image)
             if image is not None:
                 product.image = image
-            
+
             # Update other fields
             product.name = input.name
-            product.description = input.description or ''
+            product.description = input.description or ""
             product.price = input.price
-            product.sku = input.sku or ''
-            product.ean = input.ean or ''
-            product.ean_carton = input.ean_carton or ''
+            product.sku = input.sku or ""
+            product.ean = input.ean or ""
+            product.ean_carton = input.ean_carton or ""
             product.neta = input.neta or 0
             product.vat = input.vat or 27.00
             product.stock_qty = input.stock_qty or 0
             product.is_active = input.is_active if input.is_active is not None else True
-            product.only_for_rent = input.only_for_rent if input.only_for_rent is not None else False
-            
+            product.only_for_rent = (
+                input.only_for_rent if input.only_for_rent is not None else False
+            )
+
             if input.category_id:
                 product.category_id = input.category_id
-            
+
             product.save()
-            
+
             if image is not None and old_name and old_name != product.image.name:
                 try:
                     default_storage.delete(old_name)
                 except Exception as e:
-                    print("Error deleting old image:", e)    
+                    print("Error deleting old image:", e)
 
             return UpdateProduct(id=product.id, product=product)
         except Product.DoesNotExist:
@@ -232,7 +257,7 @@ class DeleteProduct(graphene.Mutation):
     def mutate(self, info, slug):
         try:
             product = Product.objects.get(slug=slug)
-            
+
             if product.is_active:
                 # Active product -> deactivate
                 product.is_active = False
@@ -242,7 +267,7 @@ class DeleteProduct(graphene.Mutation):
                 # Inactive product -> delete
                 product.delete()
                 return DeleteProduct(success=True, deactivated=False)
-                
+
         except Product.DoesNotExist:
             raise Exception("Termék nem található")
 
@@ -257,10 +282,7 @@ class CreateCategory(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, name):
         try:
-            category = Category.objects.create(
-                name=name,
-                slug=slugify(name)
-            )
+            category = Category.objects.create(name=name, slug=slugify(name))
             return CreateCategory(category=category, success=True)
         except Exception as e:
             raise Exception(str(e))
@@ -298,12 +320,14 @@ class DeleteCategory(graphene.Mutation):
     def mutate(cls, root, info, id):
         try:
             category = Category.objects.get(id=id)
-            
+
             # Check if category has products
             product_count = category.products.count()
             if product_count > 0:
-                raise Exception(f"A kategória nem törölhető, mert {product_count} termék tartozik hozzá.")
-            
+                raise Exception(
+                    f"A kategória nem törölhető, mert {product_count} termék tartozik hozzá."
+                )
+
             category.delete()
             return DeleteCategory(success=True)
         except Category.DoesNotExist:

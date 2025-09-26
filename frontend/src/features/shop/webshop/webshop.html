@@ -1,8 +1,8 @@
 <!-- Hero – teljes szélesség / magasság (headerrel csökkentve) -->
 <section
   class="shop-hero"
-  [class.shop-hero--fallback]="!heroImage()"
-  [style.backgroundImage]="heroImage() ? 'url(' + heroImage() + ')' : ''"
+  [class.shop-hero--fallback]="!currentHeroImage()"
+  [style.backgroundImage]="currentHeroImage() ? 'url(' + currentHeroImage() + ')' : ''"
   aria-label="Webshop hero"
 ></section>
 
