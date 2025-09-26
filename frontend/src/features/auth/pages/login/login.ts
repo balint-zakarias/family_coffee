@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface LoginResponse {
   success: boolean;
@@ -31,7 +32,7 @@ export class Login {
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  private readonly API_URL = 'http://localhost:8000/api/auth/login/';
+  private readonly API_URL = `${environment.apiUrl}/api/auth/login/`;
 
   constructor(
     private router: Router,
