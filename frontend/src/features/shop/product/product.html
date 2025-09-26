@@ -1,5 +1,5 @@
 <main class="product-main">
-  
+
   <!-- Loading state -->
   @if (loading()) {<section class="loading-section">
     <div class="loading-spinner"></div>
@@ -19,7 +19,7 @@
   <!-- Product details -->
   @if(!loading() && !error() && product()){<section class="product-section">
     <div class="product-container">
-      
+
       <!-- Breadcrumb -->
       <nav class="breadcrumb">
         <a (click)="goBack()" class="breadcrumb-link">Webshop</a>
@@ -30,14 +30,10 @@
       </nav>
 
       <div class="product-content">
-        
+
         <!-- Product image -->
         <div class="product-image-section">
-          <img 
-            [src]="getProductImageUrl()" 
-            [alt]="product()?.name"
-            class="product-image"
-          />
+          <img [src]="getProductImageUrl()" [alt]="product()?.name" class="product-image" />
         </div>
 
         <!-- Product info -->
@@ -45,7 +41,8 @@
           <div class="product-header">
             <h1 class="product-title">{{ product()?.name }}</h1>
             @if(product()?.onlyForRent) {<div class="rental-indicator">Csak bérelhető</div>}
-            <div class="product-price">{{ product()?.price | number:'1.0-0' }} Ft{{ product()?.onlyForRent ? ' / hó' : '' }}</div>
+            <div class="product-price">{{ product()?.price | number:'1.0-0' }} Ft{{ product()?.onlyForRent ? ' / hó' :
+              '' }}</div>
           </div>
 
           <div class="product-meta">
@@ -65,37 +62,23 @@
           </div>}
 
           <!-- Add to cart section -->
-          @if (product()?.stockQty && (product()?.stockQty || 0) > 0) { <div class="add-to-cart-section">
+          <div class="add-to-cart-section">
             <div class="quantity-selector">
               <label class="quantity-label">Mennyiség:</label>
               <div class="quantity-controls">
                 <button type="button" class="quantity-btn" (click)="decreaseQuantity()">−</button>
-                <input 
-                  type="number" 
-                  class="quantity-input"
-                  [(ngModel)]="quantity"
-                  min="1"
-                  [max]="product()?.stockQty || 1"
-                />
+                <input type="number" class="quantity-input" [(ngModel)]="quantity" min="1"
+                  [max]="product()?.stockQty || 1" />
                 <button type="button" class="quantity-btn" (click)="increaseQuantity()">+</button>
               </div>
             </div>
 
-            <button 
-              type="button" 
-              class="btn btn-primary btn-add-to-cart"
-              (click)="addToCart()"
-              [disabled]="addingToCart()"
-            >
+            <button type="button" class="btn btn-primary btn-add-to-cart" (click)="addToCart()"
+              [disabled]="addingToCart()">
               @if(addingToCart()){<span class="btn-spinner"></span>}
               {{ addingToCart() ? 'Hozzáadás...' : 'Kosárba' }}
             </button>
-          </div> }
-
-          <!-- Out of stock -->
-          @if (!product()?.stockQty || product()?.stockQty === 0) { <div class="out-of-stock">
-            <p>Ez a termék jelenleg nincs készleten.</p>
-          </div>}
+          </div>
 
         </div>
       </div>

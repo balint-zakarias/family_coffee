@@ -1,0 +1,90 @@
+[
+    {
+        "model": "catalog.Category",
+        "pk": 1,
+        "fields": {
+            "name": "Azonnal oldódó kávék",
+            "slug": "azonnal-oldodo-kavek"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 2,
+        "fields": {
+            "name": "Desszert és kávé öntetek",
+            "slug": "desszert-es-kave-ontetek"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 3,
+        "fields": {
+            "name": "Egyéb italok",
+            "slug": "egyeb-italok"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 4,
+        "fields": {
+            "name": "Hidegital automaták",
+            "slug": "hidegital-automatak"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 5,
+        "fields": {
+            "name": "Instant kávégépek",
+            "slug": "instant-kavegepek"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 6,
+        "fields": {
+            "name": "Kakaó alapú italok",
+            "slug": "kakao-alapu-italok"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 7,
+        "fields": {
+            "name": "Karos kávégépek",
+            "slug": "karos-kavegepek"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 8,
+        "fields": {
+            "name": "Kiegészítők",
+            "slug": "kiegeszitok"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 9,
+        "fields": {
+            "name": "Szemes kávé",
+            "slug": "szemes-kave"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 10,
+        "fields": {
+            "name": "Szemes kávégépek",
+            "slug": "szemes-kavegepek"
+        }
+    },
+    {
+        "model": "catalog.Category",
+        "pk": 11,
+        "fields": {
+            "name": "Tejporok",
+            "slug": "tejporok"
+        }
+    }
+]

@@ -27,7 +27,7 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, related_name="products"
     )
-    sku = models.CharField(max_length=64, unique=True)
+    sku = models.CharField(max_length=64, blank=True)
     ean = models.CharField(max_length=64, blank=True)
     ean_carton = models.CharField(max_length=64, blank=True, default="")
     neta = models.DecimalField(max_digits=10, default=0, decimal_places=2)
